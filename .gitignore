@@ -1,0 +1,29 @@
+# Ignore virtual environment
+venv/
+env_v311/
+.venv/
+
+# Ignore storage files
+storage/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore PDF reports
+*.pdf
+
+# Ignore logs
+*.log
+# Ignore environment secrets
+.env
+
+# Ignore database files
+*.db
+
+# Ignore logs
+logs/
+*.xlsx
+
+# Ignore executables
+*.exe

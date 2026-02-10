@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Request Access | Garuda Aerospace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .register-box {
+        width: 100%;
+        max-width: 450px;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .register-box h2 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--accent-color);
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+    }
+
+    .subtitle {
+        color: #aaa;
+        margin-bottom: 30px;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 5px;
+        color: #fff;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 10px rgba(0, 136, 255, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="glass-panel register-box">
+        <h2>REQUEST ACCESS</h2>
+        <p class="subtitle">Garuda Aerospace Secure Systems</p>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label for="email">Official Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="user@garudaaerospace.com"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Set Password</label>
+                <input type="password" id="password" name="password" class="form-control"
+                    placeholder="Create a strong password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                    placeholder="Confirm your password" required>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">
+                Submit Request <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; font-size: 14px;">
+            <p>Already approved? <a href="{{ url_for('login') }}" style="color: var(--accent-color);">Login Here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

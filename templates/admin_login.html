@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login | Garuda Aerospace{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="glass-panel login-box">
+
+        <h2 style="color:red;">ADMIN ACCESS</h2>
+        <p class="subtitle">Restricted Control Panel</p>
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn" style="width:100%;">
+                Admin Login 🔐
+            </button>
+
+        </form>
+
+        <p style="margin-top:15px;">
+            User? <a href="/login">Go Back</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Garuda Aerospace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 400px;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .login-box h2 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--accent-color);
+        font-weight: 600;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 5px;
+        color: #fff;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+    }
+
+    .form-footer {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .form-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .form-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .drone-anim {
+        font-size: 40px;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        animation: hover 3s infinite ease-in-out;
+    }
+
+    @keyframes hover {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="glass-panel login-box">
+        <div class="drone-anim">
+            <i class="fa-solid fa-drone"></i>
+        </div>
+        <h2>SYSTEM ACCESS</h2>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control"
+                    placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">
+                Authenticate <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+        <p style="margin-top:15px;">
+            Admin? <a href="/admin-login">Login Here</a>
+        </p>
+  
+
+        <div class="form-footer">
+            <p>New Personnel? <a href="{{ url_for('register') }}">Request Access</a></p>
+            <p><a href="#">Forgot Credentials?</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

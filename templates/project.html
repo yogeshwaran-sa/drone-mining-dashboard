@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drone Mining Dashboard</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="header-left">
+      <h1>🚁 Garuda Drone Mining Monitoring System</h1>
+      <p>Live Streaming • AI Assistant • Survey Requests</p>
+    </div>
+    <div class="header-status">
+      <span class="status-indicator"></span>
+      System Online
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- STATISTICS SECTION -->
+  <div class="stats-section">
+    <h3><i class="fas fa-chart-bar"></i> Real-Time Statistics</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <i class="fas fa-image"></i>
+        <div class="stat-content">
+          <p class="stat-label">Images</p>
+          <p class="stat-value" id="stat-images">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-video"></i>
+        <div class="stat-content">
+          <p class="stat-label">Videos</p>
+          <p class="stat-value" id="stat-videos">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-clipboard-list"></i>
+        <div class="stat-content">
+          <p class="stat-label">Requests</p>
+          <p class="stat-value" id="stat-requests">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-database"></i>
+        <div class="stat-content">
+          <p class="stat-label">Storage Used</p>
+          <p class="stat-value" id="stat-storage">0 MB</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-flex">
+
+    <!-- LEFT SIDE: LIVE STREAM -->
+    <div class="card video-card">
+      <h2><i class="fas fa-video"></i> Live Drone Stream</h2>
+      <div class="video-container">
+        <img id="videoStream" src="/video" alt="Live Stream" class="video-stream">
+        <div class="stream-indicator">
+          <span class="pulse"></span> LIVE
+        </div>
+        <div class="stream-datetime">
+          <i class="fas fa-calendar-alt"></i> <span id="streamDate">--/--/--</span>
+          <i class="fas fa-clock"></i> <span id="streamTime">--:--:--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: AI + REQUEST BOX -->
+    <div class="card control-card">
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('request')">
+          <i class="fas fa-envelope"></i> Survey Request
+        </button>
+        <button class="tab-btn" onclick="switchTab('chat')">
+          <i class="fas fa-robot"></i> AI Chat
+        </button>
+      </div>
+
+      <!-- REQUEST TAB -->
+      <div id="request-tab" class="tab-content active">
+        <h3>Submit Survey Request</h3>
+
+        <!-- Message Box -->
+        <div class="form-group">
+          <label><i class="fas fa-pencil"></i> Request Details</label>
+          <textarea id="message" rows="4" class="form-control"
+            placeholder="Example: Survey mining area Goa on 12 Feb"></textarea>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="email" class="form-control"
+            placeholder="your@email.com">
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label><i class="fas fa-phone"></i> WhatsApp Number</label>
+          <input type="text" id="phone" class="form-control"
+            placeholder="+91 98765 43210">
+        </div>
+
+        <!-- BUTTON 1: Submit Request -->
+        <button onclick="sendRequest()" class="submit-btn" id="submitBtn">
+          <i class="fas fa-paper-plane"></i> Submit Survey Request
+        </button>
+
+        <a href="/download_report">
+          <button class="submit-btn" style="background:orange; margin-top:10px;">
+            📄 Download Volume Report
+          </button>
+        </a>
+
+        <!-- Output Result -->
+        <div id="result" class="result-box"></div>
+      </div>
+
+      <!-- CHAT TAB -->
+      <div id="chat-tab" class="tab-content">
+        <h3>Chat with AI Assistant</h3>
+
+        <!-- Message Box -->
+        <div class="form-group">
+          <label><i class="fas fa-comments"></i> Ask AI</label>
+          <textarea id="chatMessage" rows="4" class="form-control"
+            placeholder="Ask about drone surveys, 3D mapping, volume estimation..."></textarea>
+        </div>
+
+        <!-- BUTTON 2: Ask AI -->
+        <button onclick="sendAIChat()" class="submit-btn ai-btn" id="chatBtn">
+          <i class="fas fa-robot"></i> Send Message
+        </button>
+
+        <!-- AI Output -->
+        <div id="aiResult" class="ai-result-box">
+          <p style="text-align:center; color:#999;">AI replies will appear here...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3D MAPPING & GEOTAG SECTION -->
+  <div class="media-section">
+    <h3><i class="fas fa-cube"></i> 3D Mapping & Location Photos</h3>
+    
+    <div class="media-grid">
+      <!-- 3D MAPPING VIEWER -->
+      <div class="card media-card">
+        <h4><i class="fas fa-map"></i> 3D Mapping</h4>
+        <div class="mapping-viewer" id="mappingViewer">
+          <div class="no-data-message">
+            <i class="fas fa-cube"></i>
+            <p>Search for a location to view 3D mapping data</p>
+          </div>
+        </div>
+        <div class="mapping-info" id="mappingInfo" style="display:none;">
+          <p><strong>Location:</strong> <span id="mapLocation">--</span></p>
+          <p><strong>Date:</strong> <span id="mapDate">--</span></p>
+          <p><strong>Status:</strong> <span id="mapStatus">Processing...</span></p>
+        </div>
+      </div>
+
+      <!-- GEOTAG PHOTOS GALLERY -->
+      <div class="card media-card">
+        <h4><i class="fas fa-images"></i> Geotag Photos</h4>
+        <div class="photo-gallery" id="photoGallery">
+          <div class="no-data-message">
+            <i class="fas fa-image"></i>
+            <p>No photos found for this location</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOLUME CALCULATION -->
+    <div class="card volume-card">
+      <h4><i class="fas fa-chart-area"></i> Volume Estimation</h4>
+      <div id="volumeResult" class="volume-result">
+        <div class="no-data-message">
+          <i class="fas fa-calculator"></i>
+          <p>Query a location to see volume calculation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-content">
+    <p>&copy; 2026 Drone Mining Monitoring System. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+      <a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a>
+      <a href="#"><i class="fas fa-headset"></i> Support</a>
+    </div>
+  </div>
+</footer>
+
+<!-- JAVASCRIPT -->
+<script>
+
+  // Update stream date and time
+  function updateStreamDateTime() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB');
+    const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+    
+    document.getElementById("streamDate").textContent = dateStr;
+    document.getElementById("streamTime").textContent = timeStr;
+  }
+
+  // Load statistics on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    updateStreamDateTime();
+    setInterval(updateStreamDateTime, 1000); // Update every second
+    
+    loadStatistics();
+    setInterval(loadStatistics, 3000); // Refresh every 3 seconds
+  });
+
+  // Load statistics from API
+  function loadStatistics() {
+    fetch("/api/statistics")
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          const stats = data.data;
+          document.getElementById("stat-images").textContent = stats.images;
+          document.getElementById("stat-videos").textContent = stats.videos;
+          document.getElementById("stat-requests").textContent = stats.requests;
+          
+          let storage = stats.storage_gb > 0 
+            ? stats.storage_gb.toFixed(2) + " GB"
+            : stats.storage_mb.toFixed(2) + " MB";
+          document.getElementById("stat-storage").textContent = storage;
+        }
+      })
+      .catch(err => console.log("Stats error:", err));
+  }
+
+  // Tab switching
+  function switchTab(tab) {
+    // Hide all tabs
+    document.getElementById("request-tab").classList.remove("active");
+    document.getElementById("chat-tab").classList.remove("active");
+
+    // Remove active class from all buttons
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+
+    // Show selected tab
+    document.getElementById(tab + "-tab").classList.add("active");
+    event.target.closest(".tab-btn").classList.add("active");
+  }
+
+  // ----------------------------
+  // GEOTAG & LOCATION PROCESSING
+  // ----------------------------
+  function processLocationQuery(location, date) {
+    console.log(`Processing query: ${location} on ${date}`);
+    
+    // Show loading state
+    showMappingLoading();
+    
+    // Simulate fetching data based on location
+    // This would connect to your backend to get actual data
+    setTimeout(() => {
+      displayMappingData(location, date);
+      displayGeotagPhotos(location, date);
+      calculateVolume(location, date);
+    }, 800);
+  }
+
+  function showMappingLoading() {
+    document.getElementById("mappingViewer").innerHTML = `
+      <div class="no-data-message" style="position:relative;z-index:10;">
+        <i class="fas fa-spinner fa-spin" style="font-size:32px;"></i>
+        <p>Loading 3D mapping data...</p>
+      </div>`;
+  }
+
+  function displayMappingData(location, date) {
+    const mappingViewer = document.getElementById("mappingViewer");
+    const mappingInfo = document.getElementById("mappingInfo");
+    
+    // Display mock 3D mapping visualization
+    mappingViewer.innerHTML = `
+      <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(0,229,255,0.05));">
+        <div style="text-align:center;color:var(--primary);z-index:5;">
+          <i class="fas fa-cube" style="font-size:64px;margin-bottom:15px;"></i>
+          <p style="margin:0;font-size:16px;font-weight:600;">3D Mesh Mapping</p>
+          <p style="margin:5px 0 0 0;font-size:12px;color:var(--text-secondary);">${location}</p>
+        </div>
+      </div>`;
+    
+    mappingInfo.style.display = "block";
+    document.getElementById("mapLocation").textContent = location;
+    document.getElementById("mapDate").textContent = date;
+    document.getElementById("mapStatus").textContent = "✅ Mapping Complete";
+    document.getElementById("mapStatus").style.color = "var(--success)";
+  }
+
+  function displayGeotagPhotos(location, date) {
+    const photoGallery = document.getElementById("photoGallery");
+    
+    // Generate mock photos based on location/date
+    let html = ``;
+    const photoCount = Math.floor(Math.random() * 8) + 4; // 4-12 photos
+    
+    for (let i = 1; i <= photoCount; i++) {
+      const colors = ['00e5ff', 'ff006e', '00ff99', 'ffa500', '4cafef'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      html += `
+        <div class="photo-item" style="aspect-ratio:1;" onclick="viewPhotoDetails('${location}', ${i})">
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#${randomColor}33,#${randomColor}11);display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-image" style="font-size:32px;color:#${randomColor};opacity:0.7;"></i>
+          </div>
+          <div class="photo-overlay">
+            <i class="fas fa-search-plus"></i>
+          </div>
+          <div style="position:absolute;bottom:5px;right:5px;font-size:10px;background:rgba(0,0,0,0.7);padding:3px 6px;border-radius:3px;z-index:20;">
+            📍
+          </div>
+        </div>`;
+    }
+    
+    photoGallery.innerHTML = html;
+  }
+
+  function viewPhotoDetails(location, photoId) {
+    alert(`📍 Location: ${location}\n📸 Photo ID: ${photoId}\n\n(This would open detailed photo view)`);
+  }
+
+  function calculateVolume(location, date) {
+    const volumeResult = document.getElementById("volumeResult");
+    
+    // Generate mock volume data
+    const area = (Math.random() * 5000 + 1000).toFixed(2); // m²
+    const depth = (Math.random() * 50 + 10).toFixed(2);    // m
+    const volume = (area * depth / 1000).toFixed(2);       // 1000s of m³
+    
+    volumeResult.innerHTML = `
+      <div class="volume-data">
+        <div class="volume-item">
+          <div>
+            <div class="volume-label">Location Area</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="volume-value">${area}</span>
+            <span class="volume-unit">m²</span>
+          </div>
+        </div>
+        <div class="volume-item">
+          <div>
+            <div class="volume-label">Average Depth</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="volume-value">${depth}</span>
+            <span class="volume-unit">m</span>
+          </div>
+        </div>
+        <div class="volume-item" style="border-left-color:var(--success);background:rgba(0,255,153,0.1);">
+          <div>
+            <div class="volume-label">Estimated Volume</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="volume-value" style="color:var(--success);">${volume}</span>
+            <span class="volume-unit">×1000 m³</span>
+          </div>
+        </div>
+        <div class="volume-item" style="margin-top:15px;">
+          <div>
+            <div class="volume-label">Survey Location</div>
+          </div>
+          <div style="text-align:right;color:var(--primary);">${location}</div>
+        </div>
+      </div>`;
+  }
+
+  // ----------------------------
+  // 1) SUBMIT SURVEY REQUEST
+  // ----------------------------
+  function sendRequest() {
+    let message = document.getElementById("message").value;
+    let email = document.getElementById("email").value;
+    let phone = document.getElementById("phone").value;
+
+    // Validation
+    if (!message.trim()) {
+      showError("Please enter request message");
+      return;
+    }
+
+    if (!email.trim()) {
+      showError("Please enter email address");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError("Please enter a valid email address");
+      return;
+    }
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+    fetch("/ai_request", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        message: message,
+        email: email,
+        phone: phone
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Survey Request';
+
+      const resultDiv = document.getElementById("result");
+      
+      if (data.status === "success") {
+        resultDiv.innerHTML = `
+          <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <strong>✅ Request Submitted Successfully!</strong>
+            <p>Saved File: ${data.file}</p>
+            <p>Notifications: ${data.notifications.email ? '📧 Email' : ''} ${data.notifications.whatsapp ? '💬 WhatsApp' : ''}</p>
+          </div>`;
+        
+        // Clear form
+        document.getElementById("message").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("phone").value = "";
+      } else {
+        resultDiv.innerHTML = `
+          <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>❌ Error</strong>
+            <p>${data.message}</p>
+          </div>`;
+      }
+    })
+    .catch(err => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Survey Request';
+      document.getElementById("result").innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          <strong>❌ Server Error</strong>
+          <p>Failed to submit request. Please try again.</p>
+        </div>`;
+    });
+  }
+
+  function showError(message) {
+    document.getElementById("result").innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        <strong>⚠️ Validation Error</strong>
+        <p>${message}</p>
+      </div>`;
+  }
+
+  // ----------------------------
+  // 2) AI CHAT FUNCTION
+  // ----------------------------
+  function sendAIChat() {
+
+  let message = document.getElementById("chatMessage").value;
+
+  if (!message.trim()) {
+    alert("Please type something to ask AI");
+    return;
+  }
+
+  const chatBtn = document.getElementById("chatBtn");
+  chatBtn.disabled = true;
+  chatBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Thinking...';
+
+  document.getElementById("aiResult").innerHTML =
+    `<div style="text-align:center;">
+      <i class="fas fa-spinner fa-spin"></i> AI is thinking...
+     </div>`;
+
+  fetch("/chat_ai", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ message: message })
+  })
+
+  .then(res => res.json())
+  .then(data => {
+
+    // ✅ Show AI Reply
+    document.getElementById("aiResult").innerHTML = `
+      <div class="ai-message">
+        <strong>🤖 AI Assistant:</strong>
+        <p>${data.reply.replace(/\n/g, "<br>")}</p>
+      </div>`;
+
+    // ✅ Update Mapping UI if results available
+    if (data.volume && data.map_image && data.geo_image) {
+      updateMappingUI(data.volume, data.map_image, data.geo_image);
+    }
+
+    chatBtn.disabled = false;
+    chatBtn.innerHTML = '<i class="fas fa-robot"></i> Send Message';
+
+    document.getElementById("chatMessage").value = "";
+  })
+
+  .catch(err => {
+    chatBtn.disabled = false;
+    chatBtn.innerHTML = '<i class="fas fa-robot"></i> Send Message';
+
+    document.getElementById("aiResult").innerHTML =
+      `<div class="error-message">
+        <i class="fas fa-exclamation-circle"></i> ❌ AI Service Error
+      </div>`;
+  });
+}
+
+function updateMappingUI(volume, mapImage, geoImage) {
+
+  // ✅ Update Volume Box
+  document.getElementById("volumeResult").innerHTML = `
+    <div class="volume-data">
+      <div class="volume-item" style="border-left-color:lime;">
+        <div class="volume-label">Final Volume</div>
+        <div style="text-align:right;">
+          <span class="volume-value">${volume}</span>
+          <span class="volume-unit">m³</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ✅ Update Mapping Viewer Image
+  document.getElementById("mappingViewer").innerHTML = `
+    <img src="${mapImage}?t=${new Date().getTime()}"
+         style="width:100%;height:100%;object-fit:cover;border-radius:15px;">
+  `;
+
+  // ✅ Update Geo-tag Photo Gallery
+  document.getElementById("photoGallery").innerHTML = `
+    <div class="photo-item">
+      <img src="${geoImage}?t=${new Date().getTime()}"
+           style="width:100%;border-radius:12px;">
+    </div>
+  `;
+}
+
+</script>
+
+</body>
+</html>
+  

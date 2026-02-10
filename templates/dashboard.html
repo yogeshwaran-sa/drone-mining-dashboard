@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Project Dashboard | Garuda Aerospace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .module-card {
+        padding: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .module-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 10px;
+    }
+
+    .module-icon {
+        font-size: 24px;
+        color: var(--primary-color);
+    }
+
+    .module-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 18px;
+        color: var(--text-color);
+    }
+
+    .video-feed {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid var(--primary-color);
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+    }
+
+    .chat-box {
+        height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border: 1px solid var(--glass-border);
+    }
+
+    .chat-msg {
+        margin-bottom: 8px;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .msg-user {
+        background: rgba(0, 136, 255, 0.2);
+        text-align: right;
+        margin-left: 20%;
+    }
+
+    .msg-ai {
+        background: rgba(0, 255, 204, 0.1);
+        text-align: left;
+        margin-right: 20%;
+    }
+
+    .btn-action {
+        width: 100%;
+        margin-top: 10px;
+        background: rgba(0, 255, 204, 0.1);
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-action:hover {
+        background: var(--primary-color);
+        color: #000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="glass-panel"
+    style="padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+        <h2 style="margin: 0; font-family: 'Orbitron', sans-serif;">PROJECT DASHBOARD</h2>
+        <p style="margin: 5px 0 0; color: #aaa;">Mission Control Center</p>
+    </div>
+    <div style="text-align: right;">
+        <span style="display: block; font-size: 12px; color: var(--accent-color);">SYSTEM STATUS</span>
+        <span style="color: #00ff00; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> OPERATIONAL</span>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+
+    <!-- 1. Live Drone Feed -->
+    <div class="glass-panel module-card">
+        <div class="module-header">
+            <i class="fa-solid fa-video module-icon"></i>
+            <span class="module-title">Live Drone Feed</span>
+        </div>
+        <div>
+            <img src="{{ url_for('video') }}" class="video-feed" alt="Drone Feed Disconnected">
+        </div>
+        <button class="btn-action"><i class="fa-solid fa-camera"></i> Capture Snapshot</button>
+    </div>
+
+    <!-- 2. AI & 3D Mapping -->
+    <div class="glass-panel module-card">
+        <div class="module-header">
+            <i class="fa-solid fa-brain module-icon"></i>
+            <span class="module-title">AI & 3D Mapping</span>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <div class="chat-msg msg-ai">
+                <strong>AI System:</strong> Hello! Ask me to start mapping, calculate volume, or analyze survey data.
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="ai-input" class="form-control" placeholder="Type command..." style="margin: 0;">
+            <button onclick="sendMessage()" class="btn" style="padding: 10px;"><i
+                    class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- 3. Statistics & Reports -->
+    <div class="glass-panel module-card">
+        <div class="module-header">
+            <i class="fa-solid fa-chart-pie module-icon"></i>
+            <span class="module-title">Data & Reports</span>
+        </div>
+        <div id="stats-content">
+            <p>Loading real-time stats...</p>
+        </div>
+        <a href="{{ url_for('download_report') }}" class="btn-action"
+            style="text-align: center; text-decoration: none; display: block;">
+            <i class="fa-solid fa-file-pdf"></i> Download Latest Report
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Fetch Stats
+    async function fetchStats() {
+        try {
+            const response = await fetch('/api/statistics');
+            const data = await response.json();
+            if (data.status === 'success') {
+                const s = data.data;
+                document.getElementById('stats-content').innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Images:</span> <strong>${s.images}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Videos:</span> <strong>${s.videos}</strong>
+                    </div>
+                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Storage:</span> <strong>${s.storage_mb} MB</strong>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error("Stats error", e);
+        }
+    }
+    fetchStats();
+    setInterval(fetchStats, 5000);
+
+    // Chat AI
+    async function sendMessage() {
+        const input = document.getElementById('ai-input');
+        const box = document.getElementById('chat-box');
+        const msg = input.value.trim();
+
+        if (!msg) return;
+
+        // User Msg
+        box.innerHTML += `<div class="chat-msg msg-user"><strong>You:</strong> ${msg}</div>`;
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // AI Request
+        try {
+            const response = await fetch('/chat_ai', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            const data = await response.json();
+
+            // AI Reply
+            box.innerHTML += `<div class="chat-msg msg-ai"><strong>AI:</strong> ${data.reply.replace(/\n/g, '<br>')}</div>`;
+            box.scrollTop = box.scrollHeight;
+
+        } catch (e) {
+            box.innerHTML += `<div class="chat-msg msg-ai" style="color: red;"><strong>Error:</strong> Connection failed.</div>`;
+        }
+    }
+
+    // Enter key for chat
+    document.getElementById('ai-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+{% endblock %}

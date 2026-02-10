@@ -30,6 +30,7 @@ import shutil
 import threading
 from datetime import datetime, timedelta
 import re
+import sqlite3
 
 
 # Load environment variables from .env
@@ -107,7 +108,20 @@ def log_login_attempt(email, role, status):
     except Exception as e:
         print(f"Error logging to Excel: {e}")
 
+def init_db():
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+    )
+    """)
+
+    conn.commit()
+    conn.close()
   # =========================
 # NOTIFICATION FUNCTIONS
 # =========================

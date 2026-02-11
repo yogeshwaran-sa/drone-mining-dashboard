@@ -194,10 +194,19 @@ def send_whatsapp_message_with_pdf(message, phone_number, pdf_url):
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
         # Normalize phone number
-        if not phone_number.startswith("+"):
-            phone_number = "+91" + phone_number
+        # Clean phone number
+        phone_number = phone_number.replace(" ", "").replace("-", "")
+
+# If starts with 91 but missing +
+        if phone_number.startswith("91") and not phone_number.startswith("+"):
+          phone_number = "+" + phone_number
+
+# If normal 10 digit Indian number
+        elif len(phone_number) == 10:
+          phone_number = "+91" + phone_number
 
         to_number = "whatsapp:" + phone_number
+
 
         # ✅ Proper WhatsApp Formatted Text
         whatsapp_text = (
@@ -229,33 +238,7 @@ def send_whatsapp_message_with_pdf(message, phone_number, pdf_url):
         return False
 
 
-def send_whatsapp_pdf(phone_number, pdf_url):
-    try:
-        TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-        TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-        TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
-        # Normalize phone number
-        if not phone_number.startswith("+"):
-            phone_number = "+91" + phone_number
-
-        to_number = "whatsapp:" + phone_number
-
-        msg = client.messages.create(
-            from_=TWILIO_WHATSAPP_FROM,
-            to=to_number,
-            body="📄 Your Drone Mining Survey Report PDF is ready!",
-            media_url=[pdf_url]  # ✅ Attach PDF
-        )
-
-        print("✅ WhatsApp PDF Sent Successfully:", msg.sid)
-        return True
-
-    except Exception as e:
-        print("❌ WhatsApp PDF Send Error:", e)
-        return False
 
 # =========================
 # EXISTING DRONE LOGIC

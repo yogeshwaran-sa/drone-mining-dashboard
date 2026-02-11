@@ -75,6 +75,12 @@
         margin-bottom: 20px;
         animation: hover 3s infinite ease-in-out;
     }
+    .login-box a {
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
+    }
+
 
     @keyframes hover {
 
@@ -116,7 +122,10 @@
             </button>
         </form>
         <p style="margin-top:15px;">
-            Admin? <a href="/admin-login">Login Here</a>
+            <a href="{{ url_for('admin_login') }}" class="btn" style="margin-top:10px; display:inline-block;">
+    Admin Login
+</a>
+
         </p>
   
 

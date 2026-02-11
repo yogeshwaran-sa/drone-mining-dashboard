@@ -1,36 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Login | Garuda Aerospace{% endblock %}
+{% block title %}Admin Login{% endblock %}
 
 {% block content %}
-<div class="login-container">
-    <div class="glass-panel login-box">
 
-        <h2 style="color:red;">ADMIN ACCESS</h2>
-        <p class="subtitle">Restricted Control Panel</p>
+<div style="display:flex;justify-content:center;align-items:center;min-height:70vh;">
+
+    <div class="glass-panel" style="width:100%;max-width:450px;padding:40px;">
+
+        <h2 style="text-align:center;color:var(--primary-color);
+        font-family:'Orbitron',sans-serif;">
+            Admin Login
+        </h2>
 
         <form method="POST">
 
-            <div class="form-group">
-                <label>Admin Email</label>
-                <input type="email" name="email" class="form-control" required>
+            <div style="margin-top:20px;">
+                <label>Email</label>
+                <input type="email" name="email" required
+                    style="width:100%;padding:12px;margin-top:8px;
+                    border-radius:6px;border:1px solid var(--glass-border);
+                    background:rgba(0,0,0,0.4);color:white;">
             </div>
 
-            <div class="form-group">
+            <div style="margin-top:20px;">
                 <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
+                <input type="password" name="password" required
+                    style="width:100%;padding:12px;margin-top:8px;
+                    border-radius:6px;border:1px solid var(--glass-border);
+                    background:rgba(0,0,0,0.4);color:white;">
             </div>
 
-            <button type="submit" class="btn" style="width:100%;">
-                Admin Login 🔐
+            <button type="submit" class="btn" style="width:100%;margin-top:25px;">
+                Login as Admin
             </button>
 
         </form>
 
-        <p style="margin-top:15px;">
-            User? <a href="/login">Go Back</a>
+        <p style="text-align:center;margin-top:20px;">
+            Back to <a href="{{ url_for('login') }}"
+            style="color:var(--primary-color);">User Login</a>
         </p>
 
     </div>
+
 </div>
+
 {% endblock %}

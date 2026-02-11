@@ -733,7 +733,7 @@ def ai_request():
     email_status = send_confirmation_email(message, email, pdf_path)
 
 # Use your ngrok public link
-    pdf_public_url = "https://rodrick-autumnal-concepcion.ngrok-free.dev/public_report"
+    pdf_public_url = "https://drone-mining-dashboard.onrender.com/public_report"
 
     whatsapp_status = send_whatsapp_message_with_pdf(
     message,
@@ -919,6 +919,23 @@ def public_report():
     if not os.path.exists(pdf_path):
         return "Report not ready yet!"
     return send_file(pdf_path, mimetype="application/pdf")
+@app.route("/setup-admin")
+def setup_admin():
+    hashed_pw = bcrypt.generate_password_hash("Yogesh@0901").decode("utf-8")
+
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+
+    c.execute("""
+    INSERT OR IGNORE INTO users (email, password, role, status)
+    VALUES (?, ?, 'admin', 'approved')
+    """, ("yogeshmalavai9@gmail.com", hashed_pw))
+
+    conn.commit()
+    conn.close()
+
+    return "✅ Admin Created Successfully"
 
 if __name__ == "__main__":
+    init_db()
     app.run(host="0.0.0.0", port=5000, debug=True)

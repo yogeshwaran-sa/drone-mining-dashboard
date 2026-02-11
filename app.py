@@ -109,19 +109,22 @@ def log_login_attempt(email, role, status):
         print(f"Error logging to Excel: {e}")
 
 def init_db():
-    conn = sqlite3.connect("database.db")
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        role TEXT DEFAULT 'user',
+        status TEXT DEFAULT 'pending'
     )
     """)
 
     conn.commit()
     conn.close()
+
   # =========================
 # NOTIFICATION FUNCTIONS
 # =========================

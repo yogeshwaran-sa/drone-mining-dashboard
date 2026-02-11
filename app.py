@@ -716,16 +716,13 @@ def ai_request():
     email_status = send_confirmation_email(message, email, pdf_path)
 
 # Use your ngrok public link
-    pdf_public_url = "https://drone-mining-dashboard.onrender.com/public_report"
+    pdf_public_url = "https://rodrick-autumnal-concepcion.ngrok-free.dev/twilio_pdf"
 
     whatsapp_status = send_whatsapp_message_with_pdf(
     message,
     phone,
     pdf_public_url
 )
-
-
-
 
     return jsonify({
         "status": "success",
@@ -862,6 +859,32 @@ def download_report():
         return "⚠️ Report not generated yet!"
     return send_file(pdf_path, as_attachment=True)
 
+@app.route("/volume_report.pdf")
+def volume_report():
+    pdf_path = os.path.join(BASE_DIR, "volume_report.pdf")
+
+    if not os.path.exists(pdf_path):
+        return "PDF Not Ready Yet", 404
+
+    return send_file(
+        pdf_path,
+        mimetype="application/pdf",
+        as_attachment=False
+    )
+
+@app.route("/twilio_pdf")
+def twilio_pdf():
+    pdf_path = os.path.join(BASE_DIR, "volume_report.pdf")
+
+    if not os.path.exists(pdf_path):
+        return "PDF Not Ready", 404
+
+    return send_file(
+        pdf_path,
+        mimetype="application/pdf"
+    )
+
+
 @app.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -899,9 +922,17 @@ def report_pdf():
 @app.route("/public_report")
 def public_report():
     pdf_path = os.path.join(BASE_DIR, "volume_report.pdf")
+
     if not os.path.exists(pdf_path):
         return "Report not ready yet!"
-    return send_file(pdf_path, mimetype="application/pdf")
+
+    return send_file(
+        pdf_path,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="Mining_Report.pdf"
+    )
+
 @app.route("/setup-admin")
 def setup_admin():
     hashed_pw = bcrypt.generate_password_hash("Yogesh@0901").decode("utf-8")
@@ -921,4 +952,4 @@ def setup_admin():
 
 if __name__ == "__main__":
     init_db()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

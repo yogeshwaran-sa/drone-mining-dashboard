@@ -1,227 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Garuda Aerospace{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>{% block title %}AeroCore | Drone Mining Intelligence{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #00ffcc;
-            --secondary-color: #0a0a0a;
-            --accent-color: #0088ff;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-color: #e0e0e0;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Rajdhani', sans-serif;
-            background-color: var(--secondary-color);
-            background-image: 
-                linear-gradient(rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.9)),
-                url('https://images.unsplash.com/photo-1579829366248-204fe8413f31?q=80&w=2070&auto=format&fit=crop'); /* Drone/Tech Background */
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: var(--text-color);
-            overflow-x: hidden;
-        }
-
-        /* Glassmorphism Container */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        /* Futuristic Header */
-        header {
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(10px);
-        }
-
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo i {
-            color: var(--accent-color);
-        }
-
-        nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 18px;
-            font-weight: 500;
-            transition: color 0.3s;
-            text-transform: uppercase;
-        }
-
-        nav a:hover {
-            color: var(--primary-color);
-            text-shadow: 0 0 10px var(--primary-color);
-        }
-
-        .btn {
-            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
-            border: none;
-            padding: 10px 20px;
-            color: #000;
-            font-weight: 700;
-            border-radius: 5px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px var(--primary-color);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary-color);
-            color: #000;
-        }
-
-        /* Flash Messages */
-        .flash-messages {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1100;
-        }
-
-        .alert {
-            padding: 15px 25px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            animation: slideIn 0.5s ease-out;
-            border-left: 5px solid;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-        }
-
-        .alert-success { border-color: #00ff00; color: #00ff00; }
-        .alert-error { border-color: #ff0000; color: #ff0000; }
-        .alert-info { border-color: #00ccff; color: #00ccff; }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 50px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-            border-top: 1px solid var(--glass-border);
-        }
-
-        /* Main Content Container */
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-            min-height: calc(100vh - 200px);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aerocore.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
 
-    <header>
-        <div class="logo">
-            <i class="fa-solid fa-drone"></i> Garuda Aerospace
+<body>
+    <div class="aero-bg"></div>
+
+    <!-- Navigation Sidebar -->
+    <aside class="nav-sidebar">
+        <div class="logo" style="padding: 0.5rem 1rem 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="AEROCORE"
+                style="height: 36px; width: auto; object-fit: contain; filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.3));">
+            <span
+                style="font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; color: var(--text-main);">AERO<span
+                    class="text-primary">CORE</span></span>
         </div>
-        <nav>
+
+        <nav style="flex: 1;">
             {% if current_user.is_authenticated %}
-                <span style="margin-right: 15px; color: var(--accent-color);">
-                    <i class="fa-solid fa-user-astronaut"></i> {{ current_user.email }}
-                </span>
-                {% if current_user.role == 'admin' %}
-                    <a href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-shield-halved"></i> Admin</a>
-                {% endif %}
-                <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-                <a href="{{ url_for('logout') }}" class="btn list-btn" style="margin-left: 10px;">Logout</a>
+            <a href="{{ url_for('dashboard') }}"
+                class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard
+            </a>
+            {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}"
+                class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-shield-halved"></i> Admin Dashboard
+            </a>
+            {% endif %}
+            <div
+                style="height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 1rem 0;">
+            </div>
+            <a href="{{ url_for('survey_logs') }}"
+                class="nav-item {% if request.endpoint == 'survey_logs' %}active{% endif %}">
+                <i class="fa-solid fa-map"></i> Survey Logs
+            </a>
+            <a href="{{ url_for('analytics') }}"
+                class="nav-item {% if request.endpoint == 'analytics' %}active{% endif %}">
+                <i class="fa-solid fa-chart-pie"></i> Analytics
+            </a>
+            <a href="{{ url_for('settings') }}"
+                class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
+                <i class="fa-solid fa-gear"></i> System Settings
+            </a>
             {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}" class="btn" style="margin-left: 10px;">Register</a>
+            <a href="{{ url_for('login') }}" class="nav-item {% if request.endpoint == 'login' %}active{% endif %}">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </a>
+            <a href="{{ url_for('register') }}"
+                class="nav-item {% if request.endpoint == 'register' %}active{% endif %}">
+                <i class="fa-solid fa-user-plus"></i> Register
+            </a>
             {% endif %}
         </nav>
+
+        <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid var(--border);">
+            {% if current_user.is_authenticated %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <div
+                    style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-glass); display: flex; align-items: center; justify-content: center; border: 1px solid var(--primary);">
+                    <i class="fa-solid fa-user-astronaut text-primary" style="font-size: 0.875rem;"></i>
+                </div>
+                <div style="overflow: hidden;">
+                    <p
+                        style="font-size: 0.75rem; font-weight: 600; margin: 0; color: var(--text-main); white-space: nowrap; text-overflow: ellipsis;">
+                        {{ current_user.email }}</p>
+                    <p style="font-size: 0.625rem; color: var(--text-dim); margin: 0; text-transform: uppercase;">{{
+                        current_user.role }}</p>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-aero btn-outline"
+                style="width: 100%; justify-content: center;">
+                <i class="fa-solid fa-power-off"></i> Logout
+            </a>
+            {% else %}
+            <p style="font-size: 0.75rem; color: var(--text-dim); text-align: center;">AeroCore Survey System v2.0</p>
+            {% endif %}
+        </div>
+    </aside>
+
+    <!-- Header Bar -->
+    <header class="header-bar">
+        <div class="header-left">
+            <h2
+                style="font-size: 1rem; color: var(--text-dim); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-satellite"></i>
+                {% block breadcrumb %}Dashboard: <span class="text-success">Online</span>{% endblock %}
+            </h2>
+        </div>
+        <div class="header-right" style="display: flex; align-items: center; gap: 1.5rem;">
+            <i class="fa-solid fa-clock-rotate-left"
+                style="font-size: 0.875rem; color: var(--text-dim); cursor: pointer;" title="History"></i>
+        </div>
     </header>
 
-    <div class="flash-messages">
-        {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="flash-messages"
+            style="position: fixed; top: calc(var(--header-height) + 1rem); right: 1rem; z-index: 1100; display: flex; flex-direction: column; gap: 0.5rem;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+            {% for category, message in messages %}
+            <div class="glass-panel animate-fade-in"
+                style="padding: 1rem 1.5rem; border-left: 4px solid var(--{% if category == 'success' %}success{% elif category == 'error' %}danger{% else %}primary{% endif %}); min-width: 300px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i
+                        class="fa-solid fa-{% if category == 'success' %}circle-check text-success{% elif category == 'error' %}circle-exclamation text-danger{% else %}circle-info text-primary{% endif %}"></i>
+                    <span style="font-size: 0.875rem; font-weight: 500;">{{ message }}</span>
+                </div>
+            </div>
+            {% endfor %}
             {% endif %}
-        {% endwith %}
-    </div>
+            {% endwith %}
+        </div>
 
-    <div class="container">
-        {% block content %}{% endblock %}
-    </div>
+        <div class="content-wrapper animate-fade-in">
+            {% block content %}{% endblock %}
+        </div>
 
-    <footer>
-        &copy; 2026 Garuda Aerospace Private Limited. All Rights Reserved. <br>
-        <span style="color: var(--primary-color); font-size: 12px;">Secure Access Control System v1.0</span>
-    </footer>
+        <footer
+            style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.75rem;">
+            <div>&copy; 2026 AeroCore Systems. All rights reserved.</div>
+            <div style="display: flex; gap: 2rem;">
+                <a href="#" style="color: inherit; text-decoration: none;">Proprietary Technology</a>
+                <a href="#" style="color: inherit; text-decoration: none;">Security Protocol 7.4</a>
+            </div>
+        </footer>
+    </main>
 
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('system-time').innerText = timeStr;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Simple flash message auto-hide
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.flash-messages > div');
+            messages.forEach(msg => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateX(20px)';
+                msg.style.transition = 'all 0.5s ease';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 5000);
+    </script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

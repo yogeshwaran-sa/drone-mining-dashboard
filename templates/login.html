@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Login | Garuda Aerospace{% endblock %}
+{% block title %}Mission Control Access | AeroCore{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -8,89 +8,161 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 80vh;
+        min-height: calc(100vh - var(--header-height) - 100px);
     }
 
     .login-box {
         width: 100%;
-        max-width: 400px;
-        padding: 40px;
-        text-align: center;
+        max-width: 460px;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
     }
 
-    .login-box h2 {
-        font-family: 'Orbitron', sans-serif;
-        color: var(--primary-color);
-        margin-bottom: 30px;
-        letter-spacing: 2px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--accent-color);
-        font-weight: 600;
-    }
-
-    .form-control {
+    /* Top glow bar */
+    .login-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid var(--glass-border);
-        border-radius: 5px;
-        color: #fff;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.3s;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+        animation: glowSweep 3s ease-in-out infinite;
     }
 
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
-    }
-
-    .form-footer {
-        margin-top: 20px;
-        font-size: 14px;
-    }
-
-    .form-footer a {
-        color: var(--primary-color);
-        text-decoration: none;
-    }
-
-    .form-footer a:hover {
-        text-decoration: underline;
-    }
-
-    .drone-anim {
-        font-size: 40px;
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        animation: hover 3s infinite ease-in-out;
-    }
-    .login-box a {
-    position: relative;
-    z-index: 9999;
-    pointer-events: auto;
-    }
-
-
-    @keyframes hover {
+    @keyframes glowSweep {
 
         0%,
         100% {
-            transform: translateY(0);
+            opacity: 0.6;
         }
 
         50% {
-            transform: translateY(-10px);
+            opacity: 1;
+        }
+    }
+
+    /* Subtle corner accents */
+    .login-box::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 60px;
+        height: 60px;
+        border-top: 2px solid rgba(0, 212, 255, 0.15);
+        border-right: 2px solid rgba(0, 212, 255, 0.15);
+        border-radius: 0 var(--radius-lg) 0 0;
+        pointer-events: none;
+    }
+
+    .logo-badge {
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, rgba(15, 23, 50, 0.6) 70%);
+        border: 2px solid rgba(0, 212, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow:
+            0 0 30px rgba(0, 212, 255, 0.15),
+            inset 0 0 20px rgba(0, 212, 255, 0.05);
+        overflow: hidden;
+        padding: 14px;
+        position: relative;
+        animation: logoPulse 4s ease-in-out infinite;
+    }
+
+    .logo-badge::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, transparent, rgba(0, 212, 255, 0.3), transparent, rgba(168, 85, 247, 0.2), transparent);
+        animation: orbitRing 6s linear infinite;
+        z-index: -1;
+    }
+
+    @keyframes logoPulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15), inset 0 0 20px rgba(0, 212, 255, 0.05);
+        }
+
+        50% {
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.25), inset 0 0 25px rgba(0, 212, 255, 0.08);
+        }
+    }
+
+    @keyframes orbitRing {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .logo-badge img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.3));
+    }
+
+    .login-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--text-main), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .login-subtitle {
+        color: var(--text-muted);
+        font-size: 0.8125rem;
+        letter-spacing: 1px;
+    }
+
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.6875rem;
+        color: var(--success);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 0.75rem;
+    }
+
+    .status-indicator::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--success);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--success);
+        animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
         }
     }
 </style>
@@ -98,40 +170,59 @@
 
 {% block content %}
 <div class="login-container">
-    <div class="glass-panel login-box">
-        <div class="drone-anim">
-            <i class="fa-solid fa-drone"></i>
+    <div class="glass-panel login-box animate-fade-in">
+        <div class="logo-badge">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="AeroCore Logo">
         </div>
-        <h2>SYSTEM ACCESS</h2>
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <div class="status-indicator">System Online</div>
+            <h2 class="login-title">MISSION CONTROL</h2>
+            <p class="login-subtitle">Authorize credentials to access the platform</p>
+        </div>
 
         <form method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                <label class="form-label" for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="operator@aerocore.systems"
                     required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control"
-                    placeholder="Enter your password" required>
+                <label class="form-label" for="password"><i class="fa-solid fa-key"></i> Access Key</label>
+                <input type="password" id="password" name="password" class="form-input"
+                    placeholder="Enter access cipher" required>
             </div>
 
-            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">
-                Authenticate <i class="fa-solid fa-arrow-right"></i>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; font-size: 0.8125rem;">
+                <label
+                    style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); cursor: pointer;">
+                    <input type="checkbox" style="accent-color: var(--primary);"> Remember Session
+                </label>
+                <a href="#" style="color: var(--primary); text-decoration: none; font-size: 0.75rem;">Recovery
+                    Protocol</a>
+            </div>
+
+            <button type="submit" class="btn-aero btn-primary"
+                style="width: 100%; justify-content: center; padding: 1rem;">
+                INITIATE ACCESS <i class="fa-solid fa-satellite-dish" style="margin-left: 0.5rem;"></i>
             </button>
         </form>
-        <p style="margin-top:15px;">
-            <a href="{{ url_for('admin_login') }}" class="btn" style="margin-top:10px; display:inline-block;">
-    Admin Login
-</a>
 
-        </p>
-  
+        <div
+            style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; font-size: 0.875rem;">
+            <p style="color: var(--text-dim); margin-bottom: 1rem;">New Personnel?</p>
+            <a href="{{ url_for('register') }}" class="btn-aero btn-outline"
+                style="width: 100%; justify-content: center;">
+                REQUEST DEPLOYMENT <i class="fa-solid fa-user-plus" style="margin-left: 0.5rem;"></i>
+            </a>
+        </div>
 
-        <div class="form-footer">
-            <p>New Personnel? <a href="{{ url_for('register') }}">Request Access</a></p>
-            <p><a href="#">Forgot Credentials?</a></p>
+        <div style="margin-top: 1.5rem; text-align: center;">
+            <a href="{{ url_for('admin_login') }}"
+                style="color: var(--text-muted); font-size: 0.75rem; text-decoration: none; border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 4px; transition: var(--transition);">
+                <i class="fa-solid fa-user-shield"></i> Command Override
+            </a>
         </div>
     </div>
 </div>

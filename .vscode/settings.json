@@ -1,0 +1,8 @@
+{
+  "workbench.colorTheme": "Default High Contrast",
+  "files.autoSave": "afterDelay",
+
+  "css.validate": false,
+  "html.validate.enabled": false,
+  "webhint.enable": false
+}

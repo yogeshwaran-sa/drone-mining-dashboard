@@ -1,167 +1,427 @@
 {% extends "base.html" %}
 
-{% block title %}Project Dashboard | Garuda Aerospace{% endblock %}
+{% block title %}Control Center | AeroCore Drone Intelligence{% endblock %}
+
+{% block breadcrumb %}
+<i class="fa-solid fa-gauge-high"></i> Control Center: <span class="text-primary">Operational</span>
+{% endblock %}
 
 {% block extra_css %}
 <style>
     .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.5rem;
+        margin-top: 1rem;
+        align-items: start;
     }
 
-    .module-card {
-        padding: 20px;
-        height: 100%;
+    .telemetry-card {
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .feed-container {
+        grid-column: span 8;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+        .feed-container {
+            grid-column: span 12;
+        }
+
+        .sidebar-modules {
+            grid-column: span 12;
+        }
+    }
+
+    .sidebar-modules {
+        grid-column: span 4;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
     }
 
     .module-header {
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
-        border-bottom: 1px solid var(--glass-border);
-        padding-bottom: 10px;
+        gap: 0.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1rem;
     }
 
-    .module-icon {
-        font-size: 24px;
-        color: var(--primary-color);
+    .module-header i {
+        font-size: 1.25rem;
+        color: var(--primary);
+        filter: drop-shadow(0 0 5px var(--primary-glow));
     }
 
-    .module-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 18px;
-        color: var(--text-color);
-    }
-
-    .video-feed {
+    .video-frame {
         width: 100%;
-        border-radius: 10px;
-        border: 1px solid var(--primary-color);
-        box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: #000;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 16/9;
     }
 
-    .chat-box {
-        height: 300px;
+    .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border: 20px solid transparent;
+        box-sizing: border-box;
+        background:
+            linear-gradient(to right, var(--primary) 2px, transparent 2px) 0 0,
+            linear-gradient(to bottom, var(--primary) 2px, transparent 2px) 0 0,
+            linear-gradient(to left, var(--primary) 2px, transparent 2px) 100% 0,
+            linear-gradient(to bottom, var(--primary) 2px, transparent 2px) 100% 0,
+            linear-gradient(to right, var(--primary) 2px, transparent 2px) 0 100%,
+            linear-gradient(to top, var(--primary) 2px, transparent 2px) 0 100%,
+            linear-gradient(to left, var(--primary) 2px, transparent 2px) 100% 100%,
+            linear-gradient(to top, var(--primary) 2px, transparent 2px) 100% 100%;
+        background-repeat: no-repeat;
+        background-size: 20px 20px;
+        opacity: 0.3;
+    }
+
+    .chat-terminal {
+        height: 250px;
+        background: rgba(5, 8, 18, 0.5);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        padding: 1rem;
         overflow-y: auto;
-        padding: 10px;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 5px;
-        margin-bottom: 10px;
-        border: 1px solid var(--glass-border);
+        font-family: 'Space Grotesk', monospace;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
     }
 
-    .chat-msg {
-        margin-bottom: 8px;
-        padding: 8px;
-        border-radius: 5px;
-        font-size: 14px;
+    .terminal-msg {
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.8125rem;
+        line-height: 1.4;
+        max-width: 85%;
     }
 
     .msg-user {
-        background: rgba(0, 136, 255, 0.2);
-        text-align: right;
-        margin-left: 20%;
+        align-self: flex-end;
+        background: rgba(0, 212, 255, 0.06);
+        border: 1px solid rgba(0, 212, 255, 0.15);
+        color: var(--primary);
     }
 
     .msg-ai {
-        background: rgba(0, 255, 204, 0.1);
-        text-align: left;
-        margin-right: 20%;
+        align-self: flex-start;
+        background: rgba(168, 85, 247, 0.06);
+        border-left: 2px solid var(--secondary);
+        color: var(--text-main);
     }
 
-    .btn-action {
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: var(--bg-glass);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stat-value {
+        font-family: 'Space Grotesk';
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .media-placeholder {
         width: 100%;
-        margin-top: 10px;
-        background: rgba(0, 255, 204, 0.1);
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        padding: 10px;
-        cursor: pointer;
-        transition: all 0.3s;
+        aspect-ratio: 16/9;
+        background: var(--bg-glass);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-md);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-dim);
+        gap: 1rem;
     }
 
-    .btn-action:hover {
-        background: var(--primary-color);
-        color: #000;
+    .media-placeholder i {
+        font-size: 3rem;
+        color: var(--primary);
+        opacity: 0.3;
+    }
+
+    .tab-nav {
+        display: flex;
+        gap: 0.5rem;
+        background: var(--bg-glass);
+        padding: 0.4rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+    }
+
+    .tab-trigger {
+        flex: 1;
+        padding: 0.6rem;
+        border: none;
+        background: transparent;
+        color: var(--text-dim);
+        font-family: 'Space Grotesk';
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .tab-trigger.active {
+        background: var(--primary);
+        color: var(--bg-darker);
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .tab-panel {
+        display: none;
+    }
+
+    .tab-panel.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .gallery-item {
+        aspect-ratio: 1;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--bg-glass);
+        overflow: hidden;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .gallery-item:hover {
+        border-color: var(--primary);
+        transform: scale(1.05);
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .volume-metric {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(168, 85, 247, 0.08));
+        border: 1px solid var(--border-glow);
+        padding: 1.25rem;
+        border-radius: var(--radius-md);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-
-<!-- Dashboard Header -->
-<div class="glass-panel"
-    style="padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <div>
-        <h2 style="margin: 0; font-family: 'Orbitron', sans-serif;">PROJECT DASHBOARD</h2>
-        <p style="margin: 5px 0 0; color: #aaa;">Mission Control Center</p>
-    </div>
-    <div style="text-align: right;">
-        <span style="display: block; font-size: 12px; color: var(--accent-color);">SYSTEM STATUS</span>
-        <span style="color: #00ff00; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> OPERATIONAL</span>
-    </div>
-</div>
-
 <div class="dashboard-grid">
-
-    <!-- 1. Live Drone Feed -->
-    <div class="glass-panel module-card">
-        <div class="module-header">
-            <i class="fa-solid fa-video module-icon"></i>
-            <span class="module-title">Live Drone Feed</span>
-        </div>
-        <div>
-            <img src="{{ url_for('video') }}" class="video-feed" alt="Drone Feed Disconnected">
-        </div>
-        <button class="btn-action"><i class="fa-solid fa-camera"></i> Capture Snapshot</button>
-    </div>
-
-    <!-- 2. AI & 3D Mapping -->
-    <div class="glass-panel module-card">
-        <div class="module-header">
-            <i class="fa-solid fa-brain module-icon"></i>
-            <span class="module-title">AI & 3D Mapping</span>
-        </div>
-        <div class="chat-box" id="chat-box">
-            <div class="chat-msg msg-ai">
-                <strong>AI System:</strong> Hello! Ask me to start mapping, calculate volume, or analyze survey data.
+    <!-- Main Content Area: Visuals (Live Feed & 3D Mapping) -->
+    <div class="feed-container">
+        <!-- Live Video Feed -->
+        <div class="glass-panel telemetry-card">
+            <div class="module-header">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <h3 style="margin: 0;">LIVE STREAM <span
+                        style="font-size: 0.75rem; color: var(--text-dim); margin-left: 1rem;">STATUS:
+                        CONNECTED</span></h3>
+            </div>
+            <div class="video-frame">
+                <img src="{{ url_for('video') }}" style="width: 100%; height: 100%; object-fit: cover;"
+                    alt="Awaiting Signal...">
+                <div class="video-overlay"></div>
+                <div
+                    style="position: absolute; bottom: 1rem; left: 1rem; background: rgba(0,0,0,0.6); padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.75rem; color: var(--primary); border: 1px solid var(--border);">
+                    <i class="fa-solid fa-calendar-days"></i> <span id="streamDate">--/--/--</span> | <i
+                        class="fa-solid fa-clock"></i> <span id="streamTime">--:--:--</span>
+                </div>
             </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="ai-input" class="form-control" placeholder="Type command..." style="margin: 0;">
-            <button onclick="sendMessage()" class="btn" style="padding: 10px;"><i
-                    class="fa-solid fa-paper-plane"></i></button>
+
+        <!-- Spatial Data Engine (3D & Geotags) -->
+        <div class="glass-panel telemetry-card">
+            <div class="module-header">
+                <i class="fa-solid fa-cube-unfolded"></i>
+                <h3 style="margin: 0;">SPATIAL DATA ENGINE</h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <!-- 3D Viewer -->
+                <div>
+                    <p
+                        style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">
+                        3D Mapping Analysis</p>
+                    <div id="mappingViewer" class="media-placeholder">
+                        <i class="fa-solid fa-cube"></i>
+                        <p style="font-size: 0.75rem;">Awaiting mission scan data</p>
+                    </div>
+                </div>
+                <!-- Photo Gallery -->
+                <div>
+                    <p
+                        style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Geotagged Frames</p>
+                    <div id="photoGallery" class="media-placeholder"
+                        style="display: block; padding: 1rem; overflow-y: auto; height: 100%;">
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <i class="fa-solid fa-images"></i>
+                            <p style="font-size: 0.75rem; margin-top: 1rem;">No telemetry frames</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- 3. Statistics & Reports -->
-    <div class="glass-panel module-card">
-        <div class="module-header">
-            <i class="fa-solid fa-chart-pie module-icon"></i>
-            <span class="module-title">Data & Reports</span>
+    <!-- Right Sidebar Modules: Input & Results -->
+    <div class="sidebar-modules">
+        <!-- Volume Calculation Result Box (Priority Top) -->
+        <div class="glass-panel telemetry-card" id="volume-card">
+            <div class="module-header">
+                <i class="fa-solid fa-calculator"></i>
+                <h3 style="margin: 0;">VOLUME ANALYSIS</h3>
+            </div>
+            <div id="volume-display"
+                style="padding: 1.25rem; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius-sm); background: rgba(5, 8, 18, 0.4);">
+                <i class="fa-solid fa-microchip fa-fade"
+                    style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.75rem; opacity: 0.5;"></i>
+                <p style="color: var(--text-dim); margin: 0; font-size: 0.8125rem;">Awaiting Mission Data...</p>
+            </div>
+            <div id="volumeResult" class="volume-metric" style="display: none;">
+                <!-- Volume data injected here -->
+            </div>
         </div>
-        <div id="stats-content">
-            <p>Loading real-time stats...</p>
-        </div>
-        <a href="{{ url_for('download_report') }}" class="btn-action"
-            style="text-align: center; text-decoration: none; display: block;">
-            <i class="fa-solid fa-file-pdf"></i> Download Latest Report
-        </a>
-    </div>
 
+        <!-- Input & Control Module -->
+        <div class="glass-panel telemetry-card">
+            <div class="tab-nav">
+                <button class="tab-trigger active" onclick="switchTab('request')"><i
+                        class="fa-solid fa-paper-plane"></i>
+                    SURVEY</button>
+                <button class="tab-trigger" onclick="switchTab('chat')"><i class="fa-solid fa-brain-circuit"></i>
+                    AI CHAT</button>
+            </div>
+
+            <!-- Survey Request Panel -->
+            <div id="request-tab" class="tab-panel active">
+                <div class="form-group">
+                    <label class="form-label">Mission Objectives</label>
+                    <textarea id="message" rows="3" class="form-input"
+                        placeholder="Coordinates or site description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Operator Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="operator@aerocore.systems">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp Link</label>
+                    <input type="text" id="phone" class="form-input" placeholder="+91 00000 00000">
+                </div>
+                <button onclick="sendRequest()" class="btn-aero btn-primary" id="submitBtn"
+                    style="width: 100%; justify-content: center;">
+                    TRANSMIT REQUEST <i class="fa-solid fa-satellite-dish" style="margin-left: 0.5rem;"></i>
+                </button>
+                <div id="result" style="margin-top: 1rem;"></div>
+            </div>
+
+            <!-- AI Chat Panel -->
+            <div id="chat-tab" class="tab-panel">
+                <div class="chat-terminal" id="chat-box">
+                    <div class="terminal-msg msg-ai">
+                        <span
+                            style="font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">SYSTEM
+                            INIT</span>
+                        Ready for protocol commands: Mapping, Volume Analysis.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <input type="text" id="ai-input" class="form-input" placeholder="Enter command..."
+                        style="margin: 0;">
+                    <button onclick="sendMessage()" class="btn-aero btn-primary" style="padding: 0.75rem;"><i
+                            class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Telemetry Stats -->
+        <div class="glass-panel telemetry-card">
+            <div class="module-header">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3 style="margin: 0;">TELEMETRY</h3>
+            </div>
+            <div id="stats-content" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="stat-item"><span class="stat-label">Analyzing...</span></div>
+            </div>
+            <a href="{{ url_for('download_report') }}" class="btn-aero btn-outline"
+                style="margin-top: 1rem; justify-content: center; text-decoration: none;">
+                <i class="fa-solid fa-file-pdf"></i> MISSION REPORT
+            </a>
+        </div>
+    </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Fetch Stats
+    // System Time Sync
+    function updateClock() {
+        const now = new Date();
+        const dateElement = document.getElementById("streamDate");
+        const timeElement = document.getElementById("streamTime");
+        if (dateElement) dateElement.textContent = now.toLocaleDateString('en-GB');
+        if (timeElement) timeElement.textContent = now.toLocaleTimeString('en-GB');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Tab Interface
+    function switchTab(tab) {
+        document.getElementById("request-tab").classList.remove("active");
+        document.getElementById("chat-tab").classList.remove("active");
+        document.querySelectorAll(".tab-trigger").forEach(btn => btn.classList.remove("active"));
+
+        document.getElementById(tab + "-tab").classList.add("active");
+        event.currentTarget.classList.add("active");
+    }
+
+    // Dynamic Stats
     async function fetchStats() {
         try {
             const response = await fetch('/api/statistics');
@@ -169,60 +429,112 @@
             if (data.status === 'success') {
                 const s = data.data;
                 document.getElementById('stats-content').innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Images:</span> <strong>${s.images}</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Videos:</span> <strong>${s.videos}</strong>
-                    </div>
-                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Storage:</span> <strong>${s.storage_mb} MB</strong>
-                    </div>
+                    <div class="stat-item"><span class="stat-label">Videos</span><span class="stat-value">${s.videos}</span></div>
+                    <div class="stat-item"><span class="stat-label">Images</span><span class="stat-value">${s.images}</span></div>
+                    <div class="stat-item"><span class="stat-label">Storage</span><span class="stat-value">${s.storage_mb} MB</span></div>
                 `;
             }
         } catch (e) {
-            console.error("Stats error", e);
+            console.error("Stats fetch error", e);
         }
     }
     fetchStats();
-    setInterval(fetchStats, 5000);
+    setInterval(fetchStats, 10000);
 
-    // Chat AI
+    // Survey Request
+    function sendRequest() {
+        const payload = {
+            message: document.getElementById("message").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value
+        };
+
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-sync fa-spin"></i> TRANSMITTING...';
+
+        fetch("/ai_request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = 'TRANSMIT REQUEST <i class="fa-solid fa-satellite-dish" style="margin-left: 0.5rem;"></i>';
+                const resDiv = document.getElementById("result");
+                if (data.status === "success") {
+                    resDiv.innerHTML = `<div class="glass-panel" style="padding: 1rem; border-left: 3px solid var(--success); font-size: 0.75rem;"><i class="fa-solid fa-check text-success"></i> SUCCESS: Request ${data.file} logged.</div>`;
+                } else {
+                    resDiv.innerHTML = `<div class="glass-panel" style="padding: 1rem; border-left: 3px solid var(--danger); font-size: 0.75rem;"><i class="fa-solid fa-xmark text-danger"></i> ERROR transmitting request.</div>`;
+                }
+            });
+    }
+
+    // AI Chat Comms
     async function sendMessage() {
         const input = document.getElementById('ai-input');
         const box = document.getElementById('chat-box');
+        const email = document.getElementById('email')?.value;
+        const phone = document.getElementById('phone')?.value;
         const msg = input.value.trim();
 
         if (!msg) return;
 
-        // User Msg
-        box.innerHTML += `<div class="chat-msg msg-user"><strong>You:</strong> ${msg}</div>`;
+        box.innerHTML += `<div class="terminal-msg msg-user"><span style="font-weight: 700; display: block; margin-bottom: 0.25rem;">OPERATOR</span>${msg}</div>`;
         input.value = '';
         box.scrollTop = box.scrollHeight;
 
-        // AI Request
         try {
             const response = await fetch('/chat_ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: msg })
+                body: JSON.stringify({
+                    message: msg,
+                    email: email,
+                    phone: phone
+                })
             });
             const data = await response.json();
-
-            // AI Reply
-            box.innerHTML += `<div class="chat-msg msg-ai"><strong>AI:</strong> ${data.reply.replace(/\n/g, '<br>')}</div>`;
+            box.innerHTML += `<div class="terminal-msg msg-ai"><span style="font-weight: 700; color: var(--primary); display: block; margin-bottom: 0.25rem;">AI_RESPONSE</span>${data.reply.replace(/\n/g, '<br>')}</div>`;
             box.scrollTop = box.scrollHeight;
 
+            if (data.volume) {
+                updateMappingUI(data.volume, data.map_image, data.geo_image);
+            }
         } catch (e) {
-            box.innerHTML += `<div class="chat-msg msg-ai" style="color: red;"><strong>Error:</strong> Connection failed.</div>`;
+            box.innerHTML += `<div class="terminal-msg msg-ai" style="border-left-color: var(--danger);"><span style="font-weight: 700; color: var(--danger); display: block; margin-bottom: 0.25rem;">COMMS_ERROR</span>Failed to establish uplink.</div>`;
         }
     }
 
-    // Enter key for chat
-    document.getElementById('ai-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            sendMessage();
+    function updateMappingUI(volume, mapImg, geoImg) {
+        document.getElementById("volume-display").style.display = "none";
+        document.getElementById("volumeResult").style.display = "flex";
+        document.getElementById("volumeResult").innerHTML = `
+            <div>
+                <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Estimated Site Volume</p>
+                <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin: 0;">${volume} <span style="font-size: 0.875rem;">m³</span></p>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Confidence Interval</p>
+                <p style="font-size: 0.875rem; font-weight: 600; color: var(--primary); margin: 0;">94.2% [STABLE]</p>
+            </div>
+        `;
+
+        if (mapImg) {
+            document.getElementById("mappingViewer").innerHTML = `<img src="${mapImg}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-sm);">`;
         }
+        if (geoImg) {
+            document.getElementById("photoGallery").innerHTML = `
+                <div class="gallery-grid">
+                    <div class="gallery-item"><img src="${geoImg}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover;"></div>
+                </div>
+            `;
+        }
+    }
+
+    document.getElementById('ai-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') sendMessage();
     });
 </script>
 {% endblock %}

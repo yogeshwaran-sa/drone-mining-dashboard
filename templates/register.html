@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Request Access | Garuda Aerospace{% endblock %}
+{% block title %}Personnel Deployment | AeroCore Mission Control{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -8,93 +8,140 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 80vh;
+        min-height: calc(100vh - var(--header-height) - 100px);
     }
 
     .register-box {
         width: 100%;
-        max-width: 450px;
-        padding: 40px;
-        text-align: center;
+        max-width: 500px;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
     }
 
-    .register-box h2 {
+    .register-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--secondary), var(--primary), transparent);
+        animation: glowSweep 3s ease-in-out infinite;
+    }
+
+    @keyframes glowSweep {
+
+        0%,
+        100% {
+            opacity: 0.6;
+        }
+
+        50% {
+            opacity: 1;
+        }
+    }
+
+    .register-title {
         font-family: 'Orbitron', sans-serif;
-        color: var(--accent-color);
-        margin-bottom: 10px;
+        font-size: 1.4rem;
+        font-weight: 700;
         letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--text-main), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .subtitle {
-        color: #aaa;
-        margin-bottom: 30px;
-        font-size: 14px;
+        color: var(--text-dim);
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 2rem;
     }
 
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--secondary);
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+        box-shadow: 0 0 10px var(--secondary-glow);
+        animation: dotPulse 2s infinite;
     }
 
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--primary-color);
-        font-weight: 600;
-    }
+    @keyframes dotPulse {
 
-    .form-control {
-        width: 100%;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid var(--glass-border);
-        border-radius: 5px;
-        color: #fff;
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.3s;
-    }
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
 
-    .form-control:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 10px rgba(0, 136, 255, 0.2);
+        50% {
+            opacity: 0.5;
+            transform: scale(0.8);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="register-container">
-    <div class="glass-panel register-box">
-        <h2>REQUEST ACCESS</h2>
-        <p class="subtitle">Garuda Aerospace Secure Systems</p>
+    <div class="glass-panel register-box animate-fade-in">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                <span class="status-dot"></span>
+                <span class="subtitle" style="margin-bottom: 0;">Registration Bay</span>
+            </div>
+            <h2 class="register-title">CREATE ACCOUNT</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Join the platform to manage your survey project
+            </p>
+        </div>
 
         <form method="POST" action="{{ url_for('register') }}">
             <div class="form-group">
-                <label for="email">Official Email</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="user@garudaaerospace.com"
-                    required>
+                <label class="form-label" for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Set Password</label>
-                <input type="password" id="password" name="password" class="form-control"
-                    placeholder="Create a strong password" required>
+                <label class="form-label" for="password"><i class="fa-solid fa-lock-hashtag"></i> Password</label>
+                <input type="password" id="password" name="password" class="form-input"
+                    placeholder="Minimum 8 characters" required>
             </div>
 
             <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
-                    placeholder="Confirm your password" required>
+                <label class="form-label" for="confirm_password"><i class="fa-solid fa-shield-check"></i> Confirm
+                    Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-input"
+                    placeholder="Repeat access cipher" required>
             </div>
 
-            <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">
-                Submit Request <i class="fa-solid fa-paper-plane"></i>
+            <div
+                style="background: rgba(0, 212, 255, 0.04); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 2rem;">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
+                    <i class="fa-solid fa-circle-info text-primary"></i>
+                    By submitting, you agree to comply with the <strong>AeroCore Intelligence & Security
+                        protocols</strong>. All activities are monitored.
+                </p>
+            </div>
+
+            <button type="submit" class="btn-aero btn-primary"
+                style="width: 100%; justify-content: center; padding: 1rem;">
+                INITIALIZE ENROLLMENT <i class="fa-solid fa-rocket-launch" style="margin-left: 0.5rem;"></i>
             </button>
         </form>
 
-        <div style="margin-top: 20px; font-size: 14px;">
-            <p>Already approved? <a href="{{ url_for('login') }}" style="color: var(--accent-color);">Login Here</a></p>
+        <div
+            style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; font-size: 0.875rem;">
+            <p style="color: var(--text-dim); margin-bottom: 1rem;">Already have clearance?</p>
+            <a href="{{ url_for('login') }}" class="btn-aero btn-outline" style="width: 100%; justify-content: center;">
+                SECURE AUTHENTICATION <i class="fa-solid fa-right-to-bracket" style="margin-left: 0.5rem;"></i>
+            </a>
         </div>
     </div>
 </div>

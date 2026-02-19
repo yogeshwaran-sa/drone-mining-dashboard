@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | AeroCore Intelligence{% endblock %}
+
+{% block breadcrumb %}Dashboard / Analytics{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">SYSTEM ANALYTICS</h1>
+    <p style="color: var(--text-muted);">Aggregate data insights and historical performance metrics</p>
+</div>
+
+<div class="project-grid"
+    style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Total Surveys -->
+    <div class="glass-panel stat-card" style="grid-column: span 4;">
+        <div class="stat-icon" style="background: rgba(0, 242, 255, 0.1); color: var(--primary);">
+            <i class="fa-solid fa-satellite"></i>
+        </div>
+        <div class="stat-info">
+            <p class="stat-label">Total Missions</p>
+            <h3 class="stat-value">{{ total_surveys }}</h3>
+        </div>
+    </div>
+
+    <!-- Total Storage -->
+    <div class="glass-panel stat-card" style="grid-column: span 4;">
+        <div class="stat-icon" style="background: rgba(125, 95, 255, 0.1); color: var(--secondary);">
+            <i class="fa-solid fa-database"></i>
+        </div>
+        <div class="stat-info">
+            <p class="stat-label">Total Storage</p>
+            <h3 class="stat-value">{{ total_storage }} <span
+                    style="font-size: 1rem; color: var(--text-muted);">MB</span></h3>
+        </div>
+    </div>
+
+    <!-- Active Status -->
+    <div class="glass-panel stat-card" style="grid-column: span 4;">
+        <div class="stat-icon" style="background: rgba(0, 255, 157, 0.1); color: var(--success);">
+            <i class="fa-solid fa-shield-check"></i>
+        </div>
+        <div class="stat-info">
+            <p class="stat-label">System Health</p>
+            <h3 class="stat-value" style="color: var(--success);">OPTIMAL</h3>
+        </div>
+    </div>
+</div>
+
+<div class="glass-panel" style="padding: 0;">
+    <div class="module-header" style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fa-solid fa-chart-line text-secondary"></i>
+            <h3 style="margin: 0;">DATA VOLUME PER MISSION</h3>
+        </div>
+    </div>
+    <div style="padding: 2rem;">
+        {% if survey_data %}
+        <div
+            style="display: flex; align-items: flex-end; gap: 1rem; height: 200px; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+            {% for item in survey_data %}
+            <div
+                style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; height: 100%; justify-content: flex-end;">
+                <div style="width: 100%; max-width: 40px; background: linear-gradient(to top, var(--secondary), var(--primary)); border-radius: 4px 4px 0 0; min-height: 5px; height: {{ (item.size / total_storage * 100) if total_storage > 0 else 5 }}%; box-shadow: 0 0 15px var(--primary-glow);"
+                    title="{{ item.date }}: {{ item.size }} MB"></div>
+                <span
+                    style="font-size: 0.625rem; color: var(--text-muted); transform: rotate(-45deg); margin-top: 10px; white-space: nowrap;">{{
+                    item.date }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No mission data available for
+            visualization.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

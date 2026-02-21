@@ -8,24 +8,91 @@
 
 {% block extra_css %}
 <style>
-    .admin-grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 1.5rem;
+    :root {
+        --admin-header-height: 100px;
     }
 
-    .stats-hub {
-        grid-column: span 12;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    .admin-container {
+        padding: 2rem 1.5rem;
+        animation: slideInDown 0.4s ease;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header Section */
+    .admin-header-controls {
+        display: flex;
+        flex-direction: column;
         gap: 1.5rem;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .admin-header-controls h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        background: linear-gradient(135deg, var(--secondary), #A063FF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .admin-header-controls p {
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    @media (min-width: 768px) {
+        .admin-header-controls {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 2rem;
+        }
+
+        .admin-header-controls h1 {
+            font-size: 2.2rem;
+        }
+    }
+
+    /* Statistics Hub */
+    .stats-hub {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
     }
 
     .telemetry-stat {
         padding: 2rem;
         text-align: center;
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.3) 100%) !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
         position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .telemetry-stat::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
     .telemetry-stat::after {
@@ -34,37 +101,110 @@
         bottom: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 30%;
+        width: 0%;
         height: 2px;
-        background: var(--primary);
-        box-shadow: 0 0 10px var(--primary-glow);
+        background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        transition: width 0.3s ease;
+    }
+
+    .telemetry-stat:hover {
+        border-color: rgba(99, 102, 241, 0.5) !important;
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.2);
+    }
+
+    .telemetry-stat:hover::before {
+        opacity: 1;
+    }
+
+    .telemetry-stat:hover::after {
+        width: 40%;
     }
 
     .stat-prime {
-        font-size: 2.5rem;
+        font-size: 2.75rem;
         font-weight: 700;
-        font-family: 'Space Grotesk';
-        color: var(--secondary);
+        background: linear-gradient(135deg, var(--secondary), #A063FF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         line-height: 1;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .stat-tag {
         font-size: 0.75rem;
-        color: var(--text-dim);
+        color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 2px;
+        font-weight: 500;
     }
 
+    /* Return Button */
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.5rem;
+        background: transparent;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: var(--radius-md);
+        color: var(--secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover {
+        border-color: var(--secondary);
+        background: rgba(99, 102, 241, 0.1);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Table Container */
     .aero-table-container {
-        grid-column: span 12;
         padding: 2rem;
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.3) 100%) !important;
+        border: 1px solid var(--border) !important;
+        margin-top: 1.5rem;
+    }
+
+    .module-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border) !important;
+    }
+
+    .module-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    .module-header i {
+        color: var(--secondary);
+        transition: all 0.3s ease;
+    }
+
+    /* Table Styling */
+    .table-responsive-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -2rem;
+        padding: 0 2rem;
     }
 
     .aero-table {
         width: 100%;
         border-collapse: separate;
-        border-spacing: 0 0.5rem;
+        border-spacing: 0 0.75rem;
+        min-width: 500px;
     }
 
     .aero-table th {
@@ -72,108 +212,298 @@
         padding: 1rem;
         font-size: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-muted);
-        border-bottom: 1px solid var(--border);
+        letter-spacing: 1.5px;
+        color: var(--text-secondary);
+        border-bottom: 1.5px solid var(--border);
+        white-space: nowrap;
+        font-weight: 700;
+    }
+
+    .aero-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .aero-table tbody tr td {
+        color: white;
+        font-weight: 500;
+    }
+
+    /* Ensure all text in table is visible */
+    .aero-table tbody tr td span,
+    .aero-table tbody tr td a,
+    .aero-table tbody tr td i,
+    .aero-table tbody tr td p {
+        color: inherit !important;
+    }
     }
 
     .aero-table tr td {
         padding: 1rem;
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(255, 255, 255, 0.03);
         border-top: 1px solid var(--border);
         border-bottom: 1px solid var(--border);
+        transition: all 0.3s ease;
     }
 
     .aero-table tr td:first-child {
         border-left: 1px solid var(--border);
-        border-top-left-radius: var(--radius-sm);
-        border-bottom-left-radius: var(--radius-sm);
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
     }
 
     .aero-table tr td:last-child {
         border-right: 1px solid var(--border);
-        border-top-right-radius: var(--radius-sm);
-        border-bottom-right-radius: var(--radius-sm);
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
     }
 
-    .aero-table tr:hover td {
-        background: var(--bg-glass);
-        border-color: var(--border-glow);
+    .aero-table tbody tr:hover td {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.05);
     }
 
+    /* Status Pills */
     .status-pill {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.4rem 0.85rem;
         border-radius: 20px;
-        font-size: 0.6875rem;
+        font-size: 0.7rem;
         font-weight: 600;
         text-transform: uppercase;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+    }
+
+    .status-pill:hover {
+        transform: scale(1.05);
     }
 
     .status-pending {
-        background: rgba(255, 204, 0, 0.1);
-        color: var(--warning);
-        border: 1px solid rgba(255, 204, 0, 0.2);
+        background: rgba(255, 204, 0, 0.15);
+        color: #FFD700;
+        border: 1px solid rgba(255, 204, 0, 0.3);
+        box-shadow: 0 0 12px rgba(255, 204, 0, 0.2);
     }
 
     .status-approved {
-        background: rgba(0, 255, 157, 0.1);
-        color: var(--success);
-        border: 1px solid rgba(0, 255, 157, 0.2);
+        background: rgba(0, 255, 157, 0.15);
+        color: #00FF9D;
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        box-shadow: 0 0 12px rgba(0, 255, 157, 0.2);
     }
 
     .status-rejected {
-        background: rgba(255, 77, 77, 0.1);
-        color: var(--danger);
-        border: 1px solid rgba(255, 77, 77, 0.2);
+        background: rgba(255, 77, 77, 0.15);
+        color: #FF4D4D;
+        border: 1px solid rgba(255, 77, 77, 0.3);
+        box-shadow: 0 0 12px rgba(255, 77, 77, 0.2);
     }
 
+    /* Action Buttons */
     .action-group {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        flex-wrap: wrap;
     }
 
     .btn-action-mini {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border);
-        background: var(--bg-glass);
-        color: var(--text-dim);
+        border-radius: 6px;
+        border: 1.5px solid rgba(99, 102, 241, 0.4);
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--secondary);
         cursor: pointer;
-        transition: var(--transition);
+        transition: all 0.3s ease;
         text-decoration: none;
+        min-width: 36px;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
     }
 
     .btn-action-mini:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-        background: var(--primary-glow);
+        border-color: var(--secondary);
+        color: white;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(124, 58, 255, 0.2));
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .btn-danger-mini {
+        border-color: rgba(255, 77, 77, 0.4) !important;
+        background: rgba(255, 77, 77, 0.1) !important;
+        color: #FF6B6B !important;
     }
 
     .btn-danger-mini:hover {
-        border-color: var(--danger);
-        color: var(--danger);
-        background: rgba(255, 77, 77, 0.1);
+        border-color: #FF4D4D;
+        color: #FF6B6B;
+        background: rgba(255, 77, 77, 0.2);
+        box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+    }
+
+    /* Empty State */
+    .text-center[colspan] {
+        background: rgba(99, 102, 241, 0.05) !important;
+        border: 1px dashed var(--border) !important;
+    }
+
+    /* User Avatar */
+    .rounded-circle {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(124, 58, 255, 0.1)) !important;
+        border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    }
+
+    .rounded-circle:hover {
+        border-color: var(--secondary) !important;
+        box-shadow: 0 0 12px rgba(99, 102, 241, 0.3) !important;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .admin-container {
+            padding: 1.5rem;
+        }
+
+        .aero-table-container {
+            padding: 1.5rem;
+        }
+
+        .table-responsive-wrapper {
+            margin: 0 -1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .stat-prime {
+            font-size: 2.25rem;
+        }
+
+        .admin-header-controls h1 {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-container {
+            padding: 1rem;
+        }
+
+        .aero-table-container {
+            padding: 1rem;
+            margin: 2rem -1rem 0 -1rem;
+        }
+
+        .table-responsive-wrapper {
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+
+        .module-header h3 {
+            font-size: 0.95rem;
+        }
+
+        .aero-table th {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.65rem;
+        }
+
+        .aero-table tr td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .stat-prime {
+            font-size: 2rem;
+        }
+
+        .telemetry-stat {
+            padding: 1.5rem;
+        }
+
+        .stats-hub {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .btn-action-mini {
+            width: 32px;
+            height: 32px;
+            font-size: 0.8rem;
+        }
+
+        .status-pill {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.65rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .admin-container {
+            padding: 0.75rem;
+        }
+
+        .admin-header-controls {
+            gap: 1rem;
+        }
+
+        .admin-header-controls h1 {
+            font-size: 1.35rem;
+        }
+
+        .aero-table-container {
+            padding: 1rem;
+        }
+
+        .aero-table th {
+            padding: 0.5rem;
+            font-size: 0.6rem;
+        }
+
+        .aero-table tr td {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .stat-prime {
+            font-size: 1.75rem;
+        }
+
+        .btn-action-mini {
+            width: 28px;
+            height: 28px;
+            font-size: 0.75rem;
+        }
+
+        .action-group {
+            gap: 0.5rem;
+        }
+
+        .d-flex {
+            gap: 0.5rem !important;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="admin-grid">
+<div class="admin-container glass-panel">
     <!-- Header Controls -->
-    <div
-        style="grid-column: span 12; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
-        <div style="margin-bottom: 2.5rem;">
-            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">ADMIN DASHBOARD</h1>
-            <p style="colopr: var(--text-muted);">Manage platform users and system settings</p>
+    <div class="admin-header-controls">
+        <div>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <img src="{{ url_for('static', filename='logoo.png') }}" alt="AeroCore Admin" style="height: 45px; width: auto; filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));"/>
+                <h1 style="margin: 0;">ADMIN DASHBOARD</h1>
+            </div>
+            <p>Manage platform users and system settings</p>
         </div>
-        <a href="{{ url_for('dashboard') }}" class="btn-aero btn-outline">
+        <a href="{{ url_for('dashboard') }}" class="btn-outline">
             <i class="fa-solid fa-arrow-left"></i> RETURN TO FLIGHT DECK
         </a>
     </div>
@@ -196,19 +526,20 @@
 
     <!-- Personnel Management Table -->
     <div class="glass-panel aero-table-container">
-        <div class="module-header" style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fa-solid fa-users text-primary"></i>
-                <h3 style="margin: 0;">USER MANAGEMENT</h3>
+        <div class="module-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-users"></i>
+                <h3>USER MANAGEMENT</h3>
             </div>
         </div>
 
-        <div style="overflow-x: auto;">
+        <div class="table-responsive-wrapper">
             <table class="aero-table">
                 <thead>
                     <tr>
                         <th>ID_REF</th>
                         <th>Deployment Entity</th>
+                        <th>Email</th>
                         <th>Role</th>
                         <th>Auth Status</th>
                         <th>Actions</th>
@@ -217,55 +548,48 @@
                 <tbody>
                     {% for user in users %}
                     <tr>
-                        <td style="font-family: 'Space Grotesk'; font-size: 0.8125rem; color: var(--text-muted);">#ID-{{
-                            user[0] }}</td>
+                        <td style="font-family: 'Space Grotesk'; font-size: 0.8125rem; color: white; font-weight: 500;">#ID-{{ user[0] }}</td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <div
-                                    style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-glass); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;">
-                                    <i class="fa-solid fa-user-tag"
-                                        style="font-size: 0.75rem; color: var(--text-dim);"></i>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; min-width: 32px;">
+                                    <i class="fa-solid fa-user-tag" style="font-size: 0.75rem; color: var(--text-dim);"></i>
                                 </div>
-                                <span style="font-weight: 500;">{{ user[1] }}</span>
+                                <span class="fw-normal" style="color: white; font-weight: 500;">{{ user[1] }}</span>
                             </div>
                         </td>
                         <td>
-                            <span
-                                style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">
-                                <i class="fa-solid fa-shield-quartered" style="margin-right: 0.25rem;"></i> {{ user[3]
-                                }}
+                            <span style="font-size: 0.75rem; color: white; font-weight: 500;">
+                                <i class="fa-solid fa-envelope me-1" style="color: var(--primary);"></i> {{ user[2] }}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.75rem; color: white; text-transform: uppercase; font-weight: 600;">
+                                <i class="fa-solid fa-shield-quartered me-1"></i> {{ user[3] }}
                             </span>
                         </td>
                         <td>
                             <span class="status-pill status-{{ user[4] }}">
-                                <i
-                                    class="fa-solid fa-{% if user[4] == 'approved' %}circle-check{% elif user[4] == 'pending' %}shuttle-space{% else %}circle-xmark{% endif %}"></i>
+                                <i class="fa-solid fa-{% if user[4] == 'approved' %}circle-check{% elif user[4] == 'pending' %}shuttle-space{% else %}circle-xmark{% endif %}"></i>
                                 {{ user[4] }}
                             </span>
                         </td>
                         <td>
                             <div class="action-group">
                                 {% if user[4] == 'pending' %}
-                                <a href="{{ url_for('approve_user', user_id=user[0]) }}" class="btn-action-mini"
-                                    title="Approve Request">
+                                <a href="{{ url_for('approve_user', user_id=user[0]) }}" class="btn-action-mini" title="Approve Request">
                                     <i class="fa-solid fa-check"></i>
                                 </a>
-                                <a href="{{ url_for('reject_user', user_id=user[0]) }}"
-                                    class="btn-action-mini btn-danger-mini" title="Reject Request">
+                                <a href="{{ url_for('reject_user', user_id=user[0]) }}" class="btn-action-mini btn-danger-mini" title="Reject Request">
                                     <i class="fa-solid fa-xmark"></i>
                                 </a>
                                 {% elif user[4] == 'approved' and user[3] != 'admin' %}
-                                <a href="{{ url_for('reject_user', user_id=user[0]) }}"
-                                    class="btn-action-mini btn-danger-mini" title="Revoke Access">
+                                <a href="{{ url_for('reject_user', user_id=user[0]) }}" class="btn-action-mini btn-danger-mini" title="Revoke Access">
                                     <i class="fa-solid fa-ban"></i>
                                 </a>
                                 {% endif %}
 
                                 {% if user[3] != 'admin' %}
-                                <a href="{{ url_for('delete_user', user_id=user[0]) }}"
-                                    class="btn-action-mini btn-danger-mini"
-                                    onclick="return confirm('CRITICAL: Purge personnel record? This action cannot be undone.')"
-                                    title="Purge Record">
+                                <a href="{{ url_for('delete_user', user_id=user[0]) }}" class="btn-action-mini btn-danger-mini" onclick="return confirm('CRITICAL: Purge personnel record? This action cannot be undone.')" title="Purge Record">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </a>
                                 {% endif %}
@@ -274,9 +598,8 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                            <i class="fa-solid fa-radar"
-                                style="font-size: 2rem; display: block; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <td colspan="5" class="text-center py-5" style="color: var(--text-secondary);">
+                            <i class="fa-solid fa-radar d-block mb-3" style="font-size: 2rem; opacity: 0.3;"></i>
                             NO PERSONNEL DATA DETECTED IN SECTOR
                         </td>
                     </tr>

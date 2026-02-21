@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Project Analytics | AeroCore Drone Intelligence{% endblock %}
+{% block title %}Project Analytics | Garuda Aerospace Intelligence{% endblock %}
 
 {% block breadcrumb %}
 <i class="fa-solid fa-microchip"></i> Sector Alpha: <span class="text-primary">Deep Survey Analysis</span>
@@ -8,54 +8,139 @@
 
 {% block extra_css %}
 <style>
+  .project-header-section {
+    margin-bottom: 3rem;
+  }
+
+  .project-title-group h1 {
+    font-size: 2.4rem;
+    font-weight: 900;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .project-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
   .project-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
   .analysis-header {
     grid-column: span 12;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .analysis-header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 
   .telemetry-grid {
     grid-column: span 12;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .telemetry-card {
+    background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .telemetry-card:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%);
+    box-shadow: 0 12px 40px rgba(0, 217, 255, 0.15);
+    transform: translateY(-6px);
+  }
+
+  .telemetry-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0.5rem 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .telemetry-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    font-weight: 600;
   }
 
   .main-view {
     grid-column: span 8;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
   .side-controls {
     grid-column: span 4;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
-  @media (max-width: 1200px) {
+  .project-panel {
+    background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
 
-    .main-view,
-    .side-controls {
-      grid-column: span 12;
-    }
+  .project-panel-header {
+    padding: 1.75rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 217, 255, 0.05);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .project-panel-header i {
+    font-size: 1.3rem;
+    color: var(--primary);
+  }
+
+  .project-panel-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .project-panel-content {
+    padding: 2rem;
   }
 
   .media-placeholder {
     width: 100%;
     aspect-ratio: 16/9;
-    background: var(--bg-glass);
+    background: linear-gradient(135deg, rgba(15, 23, 55, 0.7) 0%, rgba(10, 14, 39, 0.6) 100%);
     border: 1px dashed var(--border);
     border-radius: var(--radius-md);
     display: flex;
@@ -67,44 +152,84 @@
   }
 
   .media-placeholder i {
-    font-size: 3rem;
+    font-size: 3.5rem;
     color: var(--primary);
-    opacity: 0.3;
+    opacity: 0.2;
+  }
+
+  .media-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .spatial-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .spatial-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  .stream-overlay {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-md);
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+  }
+
+  .stream-overlay i {
+    margin-right: 0.5rem;
   }
 
   .tab-nav {
     display: flex;
     gap: 0.5rem;
-    background: var(--bg-glass);
-    padding: 0.4rem;
-    border-radius: var(--radius-sm);
-    margin-bottom: 1.5rem;
+    background: rgba(0, 217, 255, 0.05);
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 2rem;
     border: 1px solid var(--border);
   }
 
   .tab-trigger {
     flex: 1;
-    padding: 0.6rem;
+    padding: 0.7rem 1rem;
     border: none;
     background: transparent;
-    color: var(--text-dim);
-    font-family: 'Space Grotesk';
-    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    letter-spacing: 0.5px;
   }
 
   .tab-trigger.active {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: var(--bg-darker);
-    box-shadow: 0 0 15px var(--primary-glow);
+    box-shadow: 0 8px 24px rgba(0, 217, 255, 0.25);
   }
 
   .tab-panel {
@@ -113,187 +238,345 @@
 
   .tab-panel.active {
     display: block;
-    animation: fadeIn 0.4s ease;
+    animation: fadeInUp 0.3s ease;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .btn-primary, .btn-outline {
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--bg-dark);
+    box-shadow: 0 8px 20px rgba(0, 217, 255, 0.25);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 217, 255, 0.35);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: rgba(0, 217, 255, 0.08);
+  }
+
+  .volume-metric {
+    background: linear-gradient(135deg, rgba(22, 163, 74, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideInUp 0.4s ease;
+  }
+
+  .volume-metric div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .volume-metric p {
+    margin: 0;
+  }
+
+  .chat-terminal {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--primary);
+    overflow-y: auto;
+  }
+
+  .terminal-msg {
+    padding: 0.75rem;
+    background: rgba(0, 217, 255, 0.05);
+    border-left: 3px solid var(--primary);
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius-sm);
   }
 
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
   }
 
   .gallery-item {
     aspect-ratio: 1;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: var(--bg-glass);
     overflow: hidden;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
   }
 
   .gallery-item:hover {
     border-color: var(--primary);
-    transform: scale(1.05);
-    box-shadow: 0 0 15px var(--primary-glow);
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(0, 217, 255, 0.2);
   }
 
-  .volume-metric {
-    background: linear-gradient(135deg, rgba(0, 242, 255, 0.05), rgba(125, 95, 255, 0.05));
-    border: 1px solid var(--border-glow);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .success-message {
+    background: linear-gradient(135deg, rgba(22, 163, 74, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border-left: 3px solid var(--success);
+    color: var(--success);
+    font-size: 0.75rem;
+  }
+
+  .error-message {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%);
+    border-left: 3px solid var(--danger);
+    color: var(--danger);
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 1200px) {
+    .main-view,
+    .side-controls {
+      grid-column: span 12;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .project-grid {
+      gap: 1.5rem;
+    }
+
+    .telemetry-grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .media-container {
+      grid-template-columns: 1fr;
+    }
+
+    .media-placeholder {
+      min-height: 250px;
+    }
+
+    .telemetry-value {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .project-grid {
+      gap: 1rem;
+    }
+
+    .telemetry-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .telemetry-card {
+      padding: 1rem;
+    }
+
+    .telemetry-value {
+      font-size: 1.4rem;
+    }
+
+    .project-title-group h1 {
+      font-size: 1.75rem;
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="project-header-section">
+  <img src="{{ url_for('static', filename='logoo.png') }}" alt="AeroCore" style="height: 45px; width: auto; margin-right: 1rem; filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));"/>
+  <div class="project-title-group">
+    <h1><i class="fa-solid fa-chart-area" style="margin-right: 0.75rem; color: var(--primary);"></i>PROJECT DETAILS</h1>
+    <p class="project-subtitle">Advanced volume estimation and photogrammetry data analysis</p>
+  </div>
+</div>
+
 <div class="project-grid">
-  <div class="analysis-header">
-    <div style="margin-bottom: 2.5rem;">
-      <p class="subtitle">System Analytics</p>
-      <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem; letter-spacing: -0.5px;">PROJECT DETAILS</h1>
-    </div>
-    <p style="color: var(--text-muted); font-size: 0.8125rem;">Advanced volume estimation and photogrammetry data</p>
-    <div style="display: flex; gap: 1rem;">
-      <div style="text-align: right;">
-        <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: -0.25rem;">
-          Satellite Uplink</p>
-        <p style="font-size: 0.875rem; font-weight: 700; color: var(--success);"><i class="fa-solid fa-signal"></i>
-          SECURE_LINK_7</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Telemetry -->
+  <!-- Telemetry Cards -->
   <div class="telemetry-grid">
-    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-      <p style="font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0;" id="stat-images">--</p>
-      <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Drone Frames</p>
+    <div class="telemetry-card">
+      <p class="telemetry-label"><i class="fa-solid fa-images" style="margin-right: 0.4rem;"></i>Drone Frames</p>
+      <p class="telemetry-value" id="stat-images">--</p>
     </div>
-    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-      <p style="font-size: 2rem; font-weight: 700; color: var(--secondary); margin: 0;" id="stat-videos">--</p>
-      <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Video Buffers</p>
+    <div class="telemetry-card">
+      <p class="telemetry-label"><i class="fa-solid fa-video" style="margin-right: 0.4rem;"></i>Video Buffers</p>
+      <p class="telemetry-value" id="stat-videos">--</p>
     </div>
-    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-      <p style="font-size: 2rem; font-weight: 700; color: var(--accent); margin: 0;" id="stat-requests">--</p>
-      <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Mission Log</p>
+    <div class="telemetry-card">
+      <p class="telemetry-label"><i class="fa-solid fa-file-lines" style="margin-right: 0.4rem;"></i>Mission Log</p>
+      <p class="telemetry-value" id="stat-requests">--</p>
     </div>
-    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-      <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin: 0.25rem 0;" id="stat-storage">--</p>
-      <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Cloud Density</p>
+    <div class="telemetry-card">
+      <p class="telemetry-label"><i class="fa-solid fa-server" style="margin-right: 0.4rem;"></i>Cloud Density</p>
+      <p class="telemetry-value" id="stat-storage" style="font-size: 1.5rem;">--</p>
     </div>
   </div>
 
-  <!-- Main View: Video & Media -->
+  <!-- Main View -->
   <div class="main-view">
-    <div class="glass-panel" style="padding: 1.5rem;">
-      <div class="module-header">
+    <!-- Live Sensor Feed -->
+    <div class="project-panel">
+      <div class="project-panel-header">
         <i class="fa-solid fa-satellite"></i>
-        <h3 style="margin: 0;">LIVE SENSOR FEED</h3>
+        <h3>LIVE SENSOR FEED</h3>
       </div>
-      <div
-        style="position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); background: #000; aspect-ratio: 16/9;">
-        <img src="/video" style="width: 100%; height: 100%; object-fit: cover;" alt="Awaiting Feed...">
-        <div
-          style="position: absolute; bottom: 1rem; left: 1rem; background: rgba(0,0,0,0.6); padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.75rem; color: var(--primary); border: 1px solid var(--border);">
-          <i class="fa-solid fa-calendar-days"></i> <span id="streamDate">--/--/--</span> | <i
-            class="fa-solid fa-clock"></i> <span id="streamTime">--:--:--</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass-panel" style="padding: 1.5rem;">
-      <div class="module-header">
-        <i class="fa-solid fa-cube-unfolded"></i>
-        <h3 style="margin: 0;">SPATIAL DATA ENGINE</h3>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-        <!-- 3D Viewer -->
-        <div>
-          <p
-            style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">
-            3D Photogrammetry</p>
-          <div id="mappingViewer" class="media-placeholder">
-            <i class="fa-solid fa-cube"></i>
-            <p style="font-size: 0.75rem;">Initialize scan to view data</p>
+      <div class="project-panel-content">
+        <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); background: #000; aspect-ratio: 16/9;">
+          <img src="/video" style="width: 100%; height: 100%; object-fit: cover;" alt="Awaiting Feed...">
+          <div class="stream-overlay">
+            <i class="fa-solid fa-calendar-days"></i> <span id="streamDate">--/--/--</span> | <i class="fa-solid fa-clock"></i> <span id="streamTime">--:--:--</span>
           </div>
         </div>
-        <!-- Photo Gallery -->
-        <div>
-          <p
-            style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">
-            Geotagged Frames</p>
-          <div id="photoGallery" class="media-placeholder" style="display: block; padding: 1rem; overflow-y: auto;">
-            <div style="text-align: center; margin-top: 2rem;">
-              <i class="fa-solid fa-images"></i>
-              <p style="font-size: 0.75rem; margin-top: 1rem;">No telemetry frames available</p>
+      </div>
+    </div>
+
+    <!-- Spatial Data Engine -->
+    <div class="project-panel">
+      <div class="project-panel-header">
+        <i class="fa-solid fa-cube"></i>
+        <h3>SPATIAL DATA ENGINE</h3>
+      </div>
+      <div class="project-panel-content">
+        <div class="media-container">
+          <div class="spatial-item">
+            <p class="spatial-label"><i class="fa-solid fa-cube" style="margin-right: 0.4rem;"></i>3D Photogrammetry</p>
+            <div id="mappingViewer" class="media-placeholder">
+              <i class="fa-solid fa-cube"></i>
+              <p style="font-size: 0.75rem;">Initialize scan to view data</p>
+            </div>
+          </div>
+          <div class="spatial-item">
+            <p class="spatial-label"><i class="fa-solid fa-images" style="margin-right: 0.4rem;"></i>Geotagged Frames</p>
+            <div id="photoGallery" class="media-placeholder" style="display: block; padding: 1rem; overflow-y: auto;">
+              <div style="text-align: center; margin-top: 2rem;">
+                <i class="fa-solid fa-images"></i>
+                <p style="font-size: 0.75rem; margin-top: 1rem;">No telemetry frames available</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="volumeResult" class="volume-metric animate-fade-in" style="display: none;">
-        <!-- Volume data injected here -->
+        <div id="volumeResult" class="volume-metric" style="display: none;">
+          <!-- Volume data injected here -->
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Side Controls: Mission Comms -->
+  <!-- Side Controls -->
   <div class="side-controls">
-    <div class="glass-panel" style="padding: 1.5rem;">
-      <div class="tab-nav">
-        <button class="tab-trigger active" onclick="switchTab('request')"><i class="fa-solid fa-paper-plane"></i>
-          SURVEY</button>
-        <button class="tab-trigger" onclick="switchTab('chat')"><i class="fa-solid fa-brain-circuit"></i>
-          INTELLIGENCE</button>
+    <div class="project-panel">
+      <div class="project-panel-header">
+        <i class="fa-solid fa-sliders"></i>
+        <h3>MISSION CONTROL</h3>
       </div>
+      <div class="project-panel-content">
+        <div class="tab-nav">
+          <button class="tab-trigger active" onclick="switchTab('request')"><i class="fa-solid fa-paper-plane"></i>SURVEY</button>
+          <button class="tab-trigger" onclick="switchTab('chat')"><i class="fa-solid fa-brain"></i>INTELLIGENCE</button>
+        </div>
 
-      <!-- Survey Request Panel -->
-      <div id="request-tab" class="tab-panel active">
-        <div class="form-group">
-          <label class="form-label">Mission Objectives</label>
-          <textarea id="message" rows="4" class="form-input"
-            placeholder="Enter coordinates or site description..."></textarea>
+        <!-- Survey Request Panel -->
+        <div id="request-tab" class="tab-panel active">
+          <div class="form-group">
+            <label class="form-label">Mission Objectives</label>
+            <textarea id="message" rows="4" class="form-input" placeholder="Enter coordinates or site description..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Operator Email</label>
+            <input type="email" id="email" class="form-input" placeholder="operator@garuda.systems">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Link</label>
+            <input type="text" id="phone" class="form-input" placeholder="+91 00000 00000">
+          </div>
+          <button onclick="sendRequest()" class="btn-primary" id="submitBtn" style="width: 100%; justify-content: center;">
+            <i class="fa-solid fa-satellite-dish"></i> TRANSMIT REQUEST
+          </button>
+          <a href="{{ url_for('download_report') }}" class="btn-outline" style="width: 100%; justify-content: center; margin-top: 1rem; text-decoration: none;">
+            <i class="fa-solid fa-file-pdf"></i> ARCHIVE REPORT
+          </a>
+          <div id="result" style="margin-top: 1rem;"></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Operator Primary Email</label>
-          <input type="email" id="email" class="form-input" placeholder="operator@aerocore.systems">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Comms Link (WhatsApp)</label>
-          <input type="text" id="phone" class="form-input" placeholder="+91 00000 00000">
-        </div>
-        <button onclick="sendRequest()" class="btn-aero btn-primary" id="submitBtn"
-          style="width: 100%; justify-content: center;">
-          TRANSMIT REQUEST <i class="fa-solid fa-satellite-dish" style="margin-left: 0.5rem;"></i>
-        </button>
-        <a href="{{ url_for('download_report') }}" class="btn-aero btn-outline"
-          style="width: 100%; justify-content: center; margin-top: 1rem; text-decoration: none;">
-          <i class="fa-solid fa-file-pdf"></i> ARCHIVE MISSION REPORT
-        </a>
-        <div id="result" style="margin-top: 1rem;"></div>
-      </div>
 
-      <!-- AI Chat Panel -->
-      <div id="chat-tab" class="tab-panel">
-        <div class="chat-terminal" id="aiResult" style="height: 250px; margin-bottom: 1.5rem;">
-          <p style="color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-top: 4rem;">
-            INTELLIGENCE_INIT_COMPLETE... Awaiting Input</p>
+        <!-- AI Chat Panel -->
+        <div id="chat-tab" class="tab-panel">
+          <div class="chat-terminal" id="aiResult" style="height: 250px; margin-bottom: 1.5rem;">
+            <p style="color: var(--text-secondary); font-size: 0.75rem; text-align: center; margin-top: 4rem;">
+              INTELLIGENCE_INIT_COMPLETE... Awaiting Input
+            </p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Query Core</label>
+            <textarea id="chatMessage" rows="3" class="form-input" placeholder="Query volume, site status, or mapping depth..."></textarea>
+          </div>
+          <button onclick="sendAIChat()" class="btn-primary" id="chatBtn" style="width: 100%; justify-content: center;">
+            <i class="fa-solid fa-terminal"></i> EXECUTE QUERY
+          </button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Query Core</label>
-          <textarea id="chatMessage" rows="3" class="form-input"
-            placeholder="Query volume, site status, or mapping depth..."></textarea>
-        </div>
-        <button onclick="sendAIChat()" class="btn-aero btn-primary" id="chatBtn"
-          style="width: 100%; justify-content: center;">
-          EXECUTE QUERY <i class="fa-solid fa-terminal" style="margin-left: 0.5rem;"></i>
-        </button>
       </div>
     </div>
   </div>
@@ -358,12 +641,12 @@
       .then(res => res.json())
       .then(data => {
         btn.disabled = false;
-        btn.innerHTML = 'TRANSMIT REQUEST <i class="fa-solid fa-satellite-dish" style="margin-left: 0.5rem;"></i>';
+        btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> TRANSMIT REQUEST';
         const resDiv = document.getElementById("result");
         if (data.status === "success") {
-          resDiv.innerHTML = `<div class="glass-panel" style="padding: 1rem; border-left: 3px solid var(--success); font-size: 0.75rem;"><i class="fa-solid fa-check text-success"></i> UPLINK_SUCCESS: Record ${data.file} logged.</div>`;
+          resDiv.innerHTML = `<div class="success-message" style="padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;"><i class="fa-solid fa-check"></i> UPLINK_SUCCESS: Record ${data.file} logged.</div>`;
         } else {
-          resDiv.innerHTML = `<div class="glass-panel" style="padding: 1rem; border-left: 3px solid var(--danger); font-size: 0.75rem;"><i class="fa-solid fa-xmark text-danger"></i> UPLINK_ERROR: ${data.message}</div>`;
+          resDiv.innerHTML = `<div class="error-message" style="padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;"><i class="fa-solid fa-xmark"></i> UPLINK_ERROR: ${data.message}</div>`;
         }
       });
   }
@@ -386,17 +669,20 @@
       .then(res => res.json())
       .then(data => {
         btn.disabled = false;
-        btn.innerHTML = 'EXECUTE QUERY <i class="fa-solid fa-terminal" style="margin-left: 0.5rem;"></i>';
+        btn.innerHTML = '<i class="fa-solid fa-terminal"></i> EXECUTE QUERY';
 
         box.innerHTML = `
-                <div class="terminal-msg msg-ai" style="margin:0; width:100%; font-size:0.75rem;">
-                    <span style="color:var(--primary); font-weight:700;">[INTEL_REPLY]</span><br>
-                    ${data.reply.replace(/\n/g, "<br>")}
-                </div>
-            `;
+          <div class="terminal-msg" style="margin:0; width:100%; font-size:0.75rem;">
+            <span style="color:var(--primary); font-weight:700;">[INTEL_REPLY]</span><br>
+            ${data.reply.replace(/\n/g, "<br>")}
+          </div>
+        `;
 
         if (data.volume) {
           updateMappingUI(data.volume, data.map_image, data.geo_image);
+        }
+        if (data.reply.includes("Mapping Initialized")) {
+          startAutoStatusCheck();
         }
       });
   }
@@ -404,26 +690,48 @@
   function updateMappingUI(volume, mapImg, geoImg) {
     document.getElementById("volumeResult").style.display = "flex";
     document.getElementById("volumeResult").innerHTML = `
-            <div>
-                <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Estimated Site Volume</p>
-                <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin: 0;">${volume} <span style="font-size: 0.875rem;">m³</span></p>
-            </div>
-            <div style="text-align: right;">
-                <p style="font-size: 0.625rem; color: var(--text-dim); text-transform: uppercase;">Confidence Interval</p>
-                <p style="font-size: 0.875rem; font-weight: 600; color: var(--primary); margin: 0;">94.2% [ODM_STABLE]</p>
-            </div>
-        `;
+      <div>
+        <p style="font-size: 0.625rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Estimated Site Volume</p>
+        <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin: 0;">${volume} <span style="font-size: 0.875rem;">m³</span></p>
+      </div>
+      <div style="text-align: right;">
+        <p style="font-size: 0.625rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Confidence Interval</p>
+        <p style="font-size: 0.875rem; font-weight: 600; color: var(--primary); margin: 0;">94.2% [ODM_STABLE]</p>
+      </div>
+    `;
 
     if (mapImg) {
-      document.getElementById("mappingViewer").innerHTML = `<img src="${mapImg}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-sm);">`;
+      document.getElementById("mappingViewer").innerHTML = `<img src="${mapImg}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover; border-radius:var(--radius-md);">`;
     }
     if (geoImg) {
       document.getElementById("photoGallery").innerHTML = `
-                <div class="gallery-grid">
-                    <div class="gallery-item"><img src="${geoImg}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover;"></div>
-                </div>
-            `;
+        <div class="gallery-grid">
+          <div class="gallery-item"><img src="${geoImg}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover;"></div>
+        </div>
+      `;
     }
+  }
+
+  let statusInterval = null;
+
+  function startAutoStatusCheck() {
+    if (statusInterval) return;
+
+    statusInterval = setInterval(() => {
+      fetch("/chat_ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "status" })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.volume) {
+            updateMappingUI(data.volume, data.map_image, data.geo_image);
+            clearInterval(statusInterval);
+            statusInterval = null;
+          }
+        });
+    }, 5000);
   }
 </script>
 {% endblock %}

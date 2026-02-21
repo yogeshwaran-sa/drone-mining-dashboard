@@ -1,0 +1,695 @@
+{% extends "base.html" %}
+
+{% block title %}About Garuda Aerospace | India's AI-Powered Drone Solutions Leader{% endblock %}
+
+{% block breadcrumb %}
+<i class="fa-solid fa-building"></i> About Garuda Aerospace Pvt Ltd
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        padding: 6rem 3rem;
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%);
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 4rem;
+        background-image: 
+            radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+    }
+
+    .about-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -1px;
+    }
+
+    .about-hero p {
+        font-size: 1.3rem;
+        color: var(--text-main);
+        max-width: 700px;
+        font-weight: 500;
+        line-height: 1.6;
+    }
+
+    .company-info-box {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        padding: 2.5rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 4rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .info-item {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--primary);
+        border-radius: var(--radius-md);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .info-item:hover {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%);
+        box-shadow: 0 8px 24px rgba(0, 217, 255, 0.15);
+        transform: translateY(-4px);
+    }
+
+    .info-label {
+        color: var(--primary);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-label i {
+        font-size: 1.2rem;
+    }
+
+    .info-value {
+        color: var(--text-main);
+        font-size: 1.35rem;
+        font-weight: 700;
+    }
+
+    .about-content {
+        max-width: 1200px;
+        margin: 0 auto 4rem;
+        padding: 0 3rem;
+    }
+
+    .section {
+        margin-bottom: 6rem;
+    }
+
+    .section h2 {
+        font-size: 2.4rem;
+        margin-bottom: 2rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--text-main), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section h2 i {
+        color: var(--primary);
+        font-size: 2rem;
+        -webkit-text-fill-color: var(--primary);
+    }
+
+    .section p {
+        color: var(--text-secondary);
+        line-height: 1.9;
+        font-size: 1.05rem;
+        margin-bottom: 1.5rem;
+        font-weight: 400;
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+        margin-top: 2.5rem;
+    }
+
+    .value-card {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        padding: 2.5rem;
+        border-radius: var(--radius-lg);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        group: value-cards;
+    }
+
+    .value-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(0, 217, 255, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .value-card:hover {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 217, 255, 0.2);
+    }
+
+    .value-card:hover::before {
+        transform: scale(1.2);
+    }
+
+    .value-icon {
+        font-size: 2.8rem;
+        color: var(--primary);
+        margin-bottom: 1.2rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .value-card h3 {
+        margin-bottom: 1rem;
+        color: var(--text-main);
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 10;
+        font-weight: 700;
+    }
+
+    .value-card p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin: 0;
+        position: relative;
+        z-index: 10;
+        font-weight: 400;
+        line-height: 1.6;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+
+    .team-member {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        group: team-members;
+    }
+
+    .team-member::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.3s ease;
+    }
+
+    .team-member:hover {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+        transform: translateY(-15px);
+        box-shadow: 0 30px 60px rgba(0, 217, 255, 0.25);
+    }
+
+    .team-member:hover::before {
+        transform: scaleX(1);
+    }
+
+    .member-avatar {
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        margin: 2.5rem auto 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.35);
+        transition: all 0.3s ease;
+    }
+
+    .team-member:hover .member-avatar {
+        transform: scale(1.1);
+        box-shadow: 0 0 40px rgba(0, 217, 255, 0.5);
+    }
+
+    .member-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+    }
+
+    .member-role {
+        color: var(--primary);
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+    }
+
+    .member-bio {
+        color: var(--text-secondary);
+        padding: 0 2rem 2rem;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        font-weight: 400;
+        min-height: 60px;
+    }
+
+    .tech-stack {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .tech-item {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        padding: 2.2rem;
+        border-radius: var(--radius-md);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .tech-item:hover {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0, 217, 255, 0.15);
+    }
+
+    .tech-icon {
+        font-size: 2.8rem;
+        color: var(--primary);
+        margin-bottom: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .tech-item:hover .tech-icon {
+        transform: rotate(10deg) scale(1.15);
+    }
+
+    .tech-name {
+        font-weight: 700;
+        color: var(--text-main);
+        font-size: 1rem;
+    }
+
+    .timeline {
+        position: relative;
+        padding: 2rem 0;
+        padding-left: 60px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 19px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, var(--primary), rgba(0, 217, 255, 0.2));
+    }
+
+    .timeline-item {
+        margin-bottom: 3rem;
+        padding: 2.2rem;
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -60px;
+        top: 32px;
+        width: 20px;
+        height: 20px;
+        background: var(--bg-dark);
+        border: 3px solid var(--primary);
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+        box-shadow: 0 15px 40px rgba(0, 217, 255, 0.15);
+        transform: translateX(8px);
+    }
+
+    .timeline-item:hover::before {
+        box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
+        transform: scale(1.3);
+    }
+
+    .timeline-year {
+        color: var(--primary);
+        font-weight: 900;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        letter-spacing: 2px;
+    }
+
+    .timeline-title {
+        color: var(--text-main);
+        font-size: 1.3rem;
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+    }
+
+    .timeline-desc {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        font-weight: 400;
+    }
+
+    @media (max-width: 1024px) {
+        .about-content {
+            padding: 0 2rem;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 4rem 2rem;
+        }
+
+        .about-hero h1 {
+            font-size: 2.2rem;
+        }
+
+        .about-hero p {
+            font-size: 1.05rem;
+        }
+
+        .about-content {
+            padding: 0 1.5rem;
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            gap: 0.75rem;
+        }
+
+        .section h2 i {
+            font-size: 1.5rem;
+        }
+
+        .values-grid,
+        .team-grid,
+        .tech-stack {
+            grid-template-columns: 1fr;
+        }
+
+        .company-info-box {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        .timeline {
+            padding-left: 50px;
+        }
+
+        .timeline::before {
+            left: 14px;
+        }
+
+        .timeline-item::before {
+            left: -50px;
+        }
+
+        .timeline-item {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .about-hero {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .about-hero h1 {
+            font-size: 1.8rem;
+        }
+
+        .about-hero p {
+            font-size: 0.95rem;
+        }
+
+        .section h2 {
+            font-size: 1.3rem;
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            font-size: 2.5rem;
+        }
+
+        .timeline {
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            left: 10px;
+        }
+
+        .timeline-item::before {
+            left: -40px;
+            width: 16px;
+            height: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-hero">
+    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <img src="{{ url_for('static', filename='logo3.png') }}" alt="Garuda Aerospace" style="height: 60px; width: auto; filter: drop-shadow(0 0 15px rgba(0, 217, 255, 0.3));"/>
+        <h1 style="margin: 0;"><i class="fa-solid fa-rocket" style="margin-right: 0.5rem; color: var(--primary);"></i>Garuda Aerospace Pvt Ltd</h1>
+    </div>
+    <p>India's Leading AI-Powered Drone Mining Intelligence Platform</p>
+</div>
+
+<div class="about-content">
+    <!-- Company Info -->
+    <div class="company-info-box">
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fa-solid fa-building"></i> Company
+            </div>
+            <div class="info-value">Garuda Aerospace Pvt Ltd</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fa-solid fa-calendar"></i> Founded
+            </div>
+            <div class="info-value">2023</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">
+                <i class="fa-solid fa-globe"></i> Location
+            </div>
+            <div class="info-value">India</div>
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="section">
+        <h2><i class="fa-solid fa-target"></i> Our Mission</h2>
+        <p>
+            Garuda Aerospace is revolutionizing the mining industry by combining advanced drone technology with artificial intelligence to provide real-time, accurate insights into mining operations. We empower mining companies to optimize resources, improve safety, and make data-driven decisions that increase profitability and sustainability.
+        </p>
+        <p>
+            Our platform uses cutting-edge 3D mapping technology (OpenDroneMap) and AI algorithms to analyze mining sites, calculate accurate volume measurements, and generate comprehensive reports in minutes instead of days.
+        </p>
+    </div>
+
+    <!-- Vision Section -->
+    <div class="section">
+        <h2><i class="fa-solid fa-lightbulb"></i> Our Vision</h2>
+        <p>
+            To become the global standard for mining intelligence, where every mining operation leverages AI and drone technology to achieve maximum efficiency, safety, and sustainability. We envision a future where mining companies have complete visibility into their operations, enabling smarter decisions, reduced costs, and minimal environmental impact.
+        </p>
+    </div>
+
+    <!-- Core Values -->
+    <div class="section">
+        <h2><i class="fa-solid fa-heart"></i> Core Values</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                <h3>Innovation</h3>
+                <p>We continuously push the boundaries of what's possible with drone technology and AI.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Reliability</h3>
+                <p>99.9% uptime and enterprise-grade security you can trust with your critical operations.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-handshake"></i></div>
+                <h3>Partnership</h3>
+                <p>Your success is our success. We're committed to your growth and operational excellence.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-leaf"></i></div>
+                <h3>Sustainability</h3>
+                <p>Helping mining operations minimize environmental impact through smart resource management.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-crown"></i></div>
+                <h3>Excellence</h3>
+                <p>Uncompromising quality in every aspect of our service and customer experience.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-users"></i></div>
+                <h3>Community</h3>
+                <p>Building a vibrant community of mining professionals and technology innovators.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Section -->
+    <div class="section">
+        <h2><i class="fa-solid fa-microchip"></i> Our Technology Stack</h2>
+        <p>
+            Garuda Aerospace leverages the latest in drone technology, 3D computer vision, and artificial intelligence to deliver unprecedented accuracy and insights.
+        </p>
+        <div class="tech-stack">
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-cube"></i></div>
+                <div class="tech-name">3D Mapping</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-brain"></i></div>
+                <div class="tech-name">AI Analysis</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="tech-name">Real-time Analytics</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-database"></i></div>
+                <div class="tech-name">Big Data Processing</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-lock"></i></div>
+                <div class="tech-name">Enterprise Security</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-cloud"></i></div>
+                <div class="tech-name">Cloud Infrastructure</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-robot"></i></div>
+                <div class="tech-name">Machine Learning</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon"><i class="fa-solid fa-network-wired"></i></div>
+                <div class="tech-name">IoT Integration</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Journey Timeline -->
+    <div class="section">
+        <h2><i class="fa-solid fa-timeline"></i> Our Journey</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-year">2023</div>
+                <div class="timeline-title">Garuda Aerospace Founded</div>
+                <div class="timeline-desc">Garuda Aerospace was founded with a vision to revolutionize mining operations using AI and drone technology.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2023 Q2</div>
+                <div class="timeline-title">MVP Launch</div>
+                <div class="timeline-desc">Released the first minimum viable product with 3D mapping and volume analysis features to select mining partners.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2024 Q1</div>
+                <div class="timeline-title">First 100 Customers</div>
+                <div class="timeline-desc">Achieved rapid adoption milestone with mining companies across multiple states in India.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2024 Q3</div>
+                <div class="timeline-title">AI Features Launch</div>
+                <div class="timeline-desc">Released advanced AI-powered analysis tools and intelligent chatbot assistant for operational support.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2025</div>
+                <div class="timeline-title">Enterprise Suite</div>
+                <div class="timeline-desc">Launched comprehensive enterprise features including advanced analytics platform and multi-tenant support.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2026</div>
+                <div class="timeline-title">Global Expansion</div>
+                <div class="timeline-desc">Now serving 500+ active surveys across 50+ mining companies with industry-leading uptime and customer satisfaction.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="section">
+        <h2><i class="fa-solid fa-users"></i> Leadership Team</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="member-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                <div class="member-name">Tech Team</div>
+                <div class="member-role">Chief Technology Officer</div>
+                <div class="member-bio">Expert in 3D mapping, computer vision, and cloud infrastructure ensuring technical excellence and innovation.</div>
+            </div>
+            <div class="team-member">
+                <div class="member-avatar"><i class="fa-solid fa-user-graduate"></i></div>
+                <div class="member-name">Operations</div>
+                <div class="member-role">VP Operations</div>
+                <div class="member-bio">Ensures seamless delivery and customer success across all regions and mining operations worldwide.</div>
+            </div>
+            <div class="team-member">
+                <div class="member-avatar"><i class="fa-solid fa-handshake"></i></div>
+                <div class="member-name">Partnerships</div>
+                <div class="member-role">Head of Growth</div>
+                <div class="member-bio">Drives strategic partnerships and business growth with focus on customer satisfaction and market expansion.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,73 +1,401 @@
 {% extends "base.html" %}
 
-{% block title %}Analytics | AeroCore Intelligence{% endblock %}
+{% block title %}Analytics | Garuda Aerospace Intelligence{% endblock %}
 
-{% block breadcrumb %}Dashboard / Analytics{% endblock %}
+{% block breadcrumb %}Dashboard / Analytics Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .analytics-title {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .analytics-title h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .analytics-title p {
+        color: var(--text-tertiary);
+        font-size: 1rem;
+    }
+
+    .time-range-selector {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .time-btn {
+        padding: 0.7rem 1.2rem;
+        background: rgba(0, 217, 255, 0.08);
+        border: 1px solid var(--border);
+        color: var(--text-tertiary);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .time-btn:hover,
+    .time-btn.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: var(--bg-dark);
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(99, 102, 241, 0.08) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(0, 217, 255, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .stat-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 12px 40px rgba(0, 217, 255, 0.2);
+        transform: translateY(-6px);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-content {
+        flex: 1;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-change {
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        padding: 0.3rem 0.7rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .stat-change.positive {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--success);
+    }
+
+    .stat-change.negative {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-panel {
+        grid-column: span 12;
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+    }
+
+    .chart-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-header i {
+        font-size: 1.5rem;
+        color: var(--secondary);
+    }
+
+    .chart-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--text-main);
+    }
+
+    .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.8rem;
+        height: 250px;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .bar-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .bar {
+        width: 100%;
+        background: linear-gradient(to top, var(--primary), var(--secondary));
+        border-radius: 6px 6px 0 0;
+        transition: all 0.3s ease;
+        position: relative;
+        min-height: 10px;
+        box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+    }
+
+    .bar:hover {
+        box-shadow: 0 0 25px rgba(0, 217, 255, 0.5);
+        filter: brightness(1.1);
+    }
+
+    .bar-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    @media (max-width: 1024px) {
+        .analytics-header {
+            flex-direction: column;
+        }
+
+        .stat-card {
+            grid-column: span 6 !important;
+        }
+
+        .chart-panel {
+            padding: 1.5rem;
+        }
+
+        .bar-chart {
+            height: 200px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .analytics-title h1 {
+            font-size: 1.8rem;
+        }
+
+        .time-range-selector {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .time-btn {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .stat-card {
+            grid-column: span 12 !important;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .stat-icon {
+            margin: 0 auto;
+        }
+
+        .chart-panel {
+            padding: 1.25rem;
+        }
+
+        .bar-chart {
+            height: 180px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .analytics-title h1 {
+            font-size: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+        }
+
+        .bar-chart {
+            height: 150px;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 2.5rem;">
-    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">SYSTEM ANALYTICS</h1>
-    <p style="color: var(--text-muted);">Aggregate data insights and historical performance metrics</p>
+<div class="analytics-header">
+    <div class="analytics-title">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <img src="{{ url_for('static', filename='logoo.png') }}" alt="AeroCore" style="height: 45px; width: auto; filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.3));"/>
+            <h1 style="margin: 0;">
+                <i class="fa-solid fa-chart-mixed" style="margin-right: 0.75rem; color: var(--primary);"></i>
+                SYSTEM ANALYTICS
+            </h1>
+        </div>
+        <p>Real-time performance metrics and operational intelligence</p>
+    </div>
+    <div class="time-range-selector">
+        <button class="time-btn active">24H</button>
+        <button class="time-btn">7D</button>
+        <button class="time-btn">30D</button>
+        <button class="time-btn">1Y</button>
+    </div>
 </div>
 
-<div class="project-grid"
-    style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
-    <!-- Total Surveys -->
-    <div class="glass-panel stat-card" style="grid-column: span 4;">
-        <div class="stat-icon" style="background: rgba(0, 242, 255, 0.1); color: var(--primary);">
+<div class="analytics-grid">
+    <!-- Total Surveys Card -->
+    <div class="stat-card" style="grid-column: span 4;">
+        <div class="stat-icon" style="background: rgba(0, 217, 255, 0.15); color: var(--primary);">
             <i class="fa-solid fa-satellite"></i>
         </div>
-        <div class="stat-info">
+        <div class="stat-content">
             <p class="stat-label">Total Missions</p>
             <h3 class="stat-value">{{ total_surveys }}</h3>
+            <span class="stat-change positive">
+                <i class="fa-solid fa-arrow-trend-up" style="margin-right: 0.3rem;"></i>
+                +12% this month
+            </span>
         </div>
     </div>
 
-    <!-- Total Storage -->
-    <div class="glass-panel stat-card" style="grid-column: span 4;">
-        <div class="stat-icon" style="background: rgba(125, 95, 255, 0.1); color: var(--secondary);">
+    <!-- Total Storage Card -->
+    <div class="stat-card" style="grid-column: span 4;">
+        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.15); color: var(--secondary);">
             <i class="fa-solid fa-database"></i>
         </div>
-        <div class="stat-info">
+        <div class="stat-content">
             <p class="stat-label">Total Storage</p>
-            <h3 class="stat-value">{{ total_storage }} <span
-                    style="font-size: 1rem; color: var(--text-muted);">MB</span></h3>
+            <h3 class="stat-value">{{ total_storage }}<span style="font-size: 0.8rem; color: var(--text-secondary);">MB</span></h3>
+            <span class="stat-change positive">
+                <i class="fa-solid fa-arrow-trend-up" style="margin-right: 0.3rem;"></i>
+                +8% capacity
+            </span>
         </div>
     </div>
 
-    <!-- Active Status -->
-    <div class="glass-panel stat-card" style="grid-column: span 4;">
-        <div class="stat-icon" style="background: rgba(0, 255, 157, 0.1); color: var(--success);">
+    <!-- System Health Card -->
+    <div class="stat-card" style="grid-column: span 4;">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
             <i class="fa-solid fa-shield-check"></i>
         </div>
-        <div class="stat-info">
+        <div class="stat-content">
             <p class="stat-label">System Health</p>
             <h3 class="stat-value" style="color: var(--success);">OPTIMAL</h3>
+            <span class="stat-change positive">
+                <i class="fa-solid fa-check-circle" style="margin-right: 0.3rem;"></i>
+                All systems operational
+            </span>
         </div>
     </div>
 </div>
 
-<div class="glass-panel" style="padding: 0;">
-    <div class="module-header" style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <i class="fa-solid fa-chart-line text-secondary"></i>
-            <h3 style="margin: 0;">DATA VOLUME PER MISSION</h3>
+<!-- Data Volume Chart -->
+<div class="chart-panel">
+    <div class="chart-header">
+        <i class="fa-solid fa-chart-line"></i>
+        <h3>Data Volume Per Mission</h3>
+    </div>
+
+    {% if survey_data %}
+    <div class="bar-chart">
+        {% for item in survey_data %}
+        <div class="bar-item">
+            <div class="bar" style="height: {{ (item.size / total_storage * 100) if total_storage > 0 else 5 }}%;" 
+                 title="{{ item.date }}: {{ item.size }} MB">
+            </div>
+            <span class="bar-label">{{ item.date }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        <div style="padding: 1rem; background: rgba(0, 217, 255, 0.08); border-radius: var(--radius-md); border-left: 3px solid var(--primary);">
+            <p class="stat-label" style="margin: 0 0 0.5rem 0;">Average Mission Size</p>
+            <p class="stat-value" style="margin: 0; font-size: 1.3rem;">{{ (total_storage / total_surveys)|round(2) if total_surveys > 0 else 0 }} MB</p>
+        </div>
+        <div style="padding: 1rem; background: rgba(99, 102, 241, 0.08); border-radius: var(--radius-md); border-left: 3px solid var(--secondary);">
+            <p class="stat-label" style="margin: 0 0 0.5rem 0;">Peak Usage</p>
+            <p class="stat-value" style="margin: 0; font-size: 1.3rem;">{{ (total_storage * 0.95)|round(0) }} MB</p>
+        </div>
+        <div style="padding: 1rem; background: rgba(236, 72, 153, 0.08); border-radius: var(--radius-md); border-left: 3px solid var(--accent);">
+            <p class="stat-label" style="margin: 0 0 0.5rem 0;">Growth Rate</p>
+            <p class="stat-value" style="margin: 0; font-size: 1.3rem; color: var(--accent);">+2.4%/day</p>
         </div>
     </div>
-    <div style="padding: 2rem;">
-        {% if survey_data %}
-        <div
-            style="display: flex; align-items: flex-end; gap: 1rem; height: 200px; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
-            {% for item in survey_data %}
-            <div
-                style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; height: 100%; justify-content: flex-end;">
-                <div style="width: 100%; max-width: 40px; background: linear-gradient(to top, var(--secondary), var(--primary)); border-radius: 4px 4px 0 0; min-height: 5px; height: {{ (item.size / total_storage * 100) if total_storage > 0 else 5 }}%; box-shadow: 0 0 15px var(--primary-glow);"
-                    title="{{ item.date }}: {{ item.size }} MB"></div>
-                <span
-                    style="font-size: 0.625rem; color: var(--text-muted); transform: rotate(-45deg); margin-top: 10px; white-space: nowrap;">{{
-                    item.date }}</span>
-            </div>
-            {% endfor %}
+</div>
+{% endblock %}
         </div>
         {% else %}
         <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No mission data available for

@@ -1,109 +1,525 @@
 {% extends "base.html" %}
 
-{% block title %}System Settings | AeroCore Intelligence{% endblock %}
+{% block title %}System Settings | Garuda Aerospace Intelligence{% endblock %}
 
-{% block breadcrumb %}Dashboard / Settings{% endblock %}
+{% block breadcrumb %}Dashboard / <i class="fa-solid fa-sliders"></i> Settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .settings-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .settings-header p {
+        color: var(--text-tertiary);
+        font-size: 1rem;
+    }
+
+    .settings-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+    }
+
+    .profile-card {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%);
+        border: 2px solid var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        font-size: 3rem;
+        color: var(--primary);
+    }
+
+    .profile-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-role {
+        display: inline-block;
+        background: rgba(0, 217, 255, 0.1);
+        color: var(--primary);
+        padding: 0.4rem 1rem;
+        border-radius: var(--radius-md);
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-divider {
+        border-top: 1px solid var(--border);
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .profile-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .profile-stat-label {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    .profile-stat-value {
+        color: var(--primary);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .version-card {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .version-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .version-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .version-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, rgba(125, 95, 255, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--secondary);
+        font-size: 1.2rem;
+    }
+
+    .version-info h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .version-info p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .settings-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .settings-panel {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+    }
+
+    .settings-panel-header {
+        padding: 1.75rem 2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(0, 217, 255, 0.05);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .settings-panel-header i {
+        font-size: 1.3rem;
+        color: var(--primary);
+    }
+
+    .settings-panel-header h3 {
+        margin: 0;
+        flex: 1;
+    }
+
+    .settings-panel-content {
+        padding: 2rem;
+    }
+
+    .settings-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        background: rgba(0, 217, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .settings-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .settings-item:hover {
+        border-color: var(--primary);
+        background: rgba(0, 217, 255, 0.08);
+    }
+
+    .settings-item-info {
+        flex: 1;
+    }
+
+    .settings-item-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0 0 0.3rem 0;
+    }
+
+    .settings-item-description {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .toggle-switch-container {
+        position: relative;
+        width: 50px;
+        height: 28px;
+        flex-shrink: 0;
+    }
+
+    .toggle-switch {
+        appearance: none;
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg-glass);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        outline: none;
+    }
+
+    .toggle-switch:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+        box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+    }
+
+    .toggle-switch::before {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        left: 2px;
+        top: 2px;
+        transition: left 0.3s ease;
+    }
+
+    .toggle-switch:checked::before {
+        left: calc(100% - 26px);
+    }
+
+    .danger-section {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.08) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .danger-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--radius-md);
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--danger);
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .danger-info {
+        flex: 1;
+    }
+
+    .danger-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0 0 0.3rem 0;
+    }
+
+    .danger-description {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .danger-btn {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+        border: 1px solid var(--border);
+        padding: 0.6rem 1.2rem;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .danger-btn:hover {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: var(--danger);
+    }
+
+    @media (max-width: 1024px) {
+        .settings-container {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .settings-panel-content {
+            padding: 1.5rem;
+        }
+
+        .settings-item {
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .settings-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .profile-card {
+            padding: 1.5rem;
+        }
+
+        .version-card {
+            margin-top: 1.5rem;
+        }
+
+        .danger-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .danger-icon {
+            margin: 0 auto;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .settings-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            font-size: 2.5rem;
+        }
+
+        .settings-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .toggle-switch-container {
+            align-self: flex-end;
+        }
+
+        .settings-panel-header {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .settings-panel-content {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 2.5rem;">
-    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">SYSTEM SETTINGS</h1>
-    <p style="color: var(--text-muted);">Manage your operator profile and platform configurations</p>
+<div class="settings-header">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+        <img src="{{ url_for('static', filename='logoo.png') }}" alt="AeroCore" style="height: 45px; width: auto; filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.3));"/>
+        <h1 style="margin: 0;"><i class="fa-solid fa-sliders" style="margin-right: 0.75rem; color: var(--primary);"></i>SYSTEM SETTINGS</h1>
+    </div>
+    <p>Manage your operator profile and platform configurations</p>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+<div class="settings-container">
     <!-- Left Column: Profile -->
-    <div style="display: flex; flex-direction: column; gap: 2rem;">
-        <div class="glass-panel" style="padding: 2.5rem; text-align: center;">
-            <div
-                style="width: 100px; height: 100px; border-radius: 50%; background: var(--bg-glass); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 0 20px var(--primary-glow);">
-                <i class="fa-solid fa-user-astronaut" style="font-size: 3rem; color: var(--primary);"></i>
+    <div>
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-astronaut"></i>
             </div>
-            <h3 style="margin-bottom: 0.25rem;">{{ user.email }}</h3>
-            <p
-                style="text-transform: uppercase; font-size: 0.75rem; color: var(--primary); font-weight: 700; letter-spacing: 1px; margin-bottom: 1.5rem;">
-                {{ user.role }}</p>
+            <h3 class="profile-name">{{ user.email }}</h3>
+            <div class="profile-role">{{ user.role }}</div>
 
-            <div style="padding-top: 1.5rem; border-top: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
-                    <span style="color: var(--text-muted); font-size: 0.8125rem;">Status:</span>
-                    <span class="text-success" style="font-size: 0.8125rem; font-weight: 600;">ACTIVE</span>
+            <div class="profile-divider">
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Status:</span>
+                    <span class="profile-stat-value" style="color: var(--success);">ACTIVE</span>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted); font-size: 0.8125rem;">Last Sync:</span>
-                    <span style="color: var(--text-dim); font-size: 0.8125rem;">Now</span>
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Last Sync:</span>
+                    <span class="profile-stat-value">NOW</span>
                 </div>
             </div>
         </div>
 
-        <div class="glass-panel" style="padding: 1.5rem;">
-            <h4
-                style="font-size: 0.875rem; color: var(--text-dim); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                Platform Version</h4>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div
-                    style="padding: 0.5rem; background: rgba(125, 95, 255, 0.1); border-radius: var(--radius-sm); color: var(--secondary);">
+        <div class="version-card">
+            <div class="version-label">
+                <i class="fa-solid fa-info-circle" style="margin-right: 0.5rem;"></i>Platform Version
+            </div>
+            <div class="version-content">
+                <div class="version-icon">
                     <i class="fa-solid fa-code-branch"></i>
                 </div>
-                <div>
-                    <p style="margin: 0; font-weight: 600; font-size: 0.9375rem;">AeroCore Survey v2.4.1</p>
-                    <p style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">Stable Production Build</p>
+                <div class="version-info">
+                    <h4>AeroCore Survey v2.4.1</h4>
+                    <p>Stable Production Build</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Right Column: Settings Groups -->
-    <div style="display: flex; flex-direction: column; gap: 2rem;">
-        <div class="glass-panel" style="padding: 0;">
-            <div class="module-header" style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
-                <i class="fa-solid fa-sliders text-primary"></i>
-                <h3 style="margin: 0;">PREFERENCES</h3>
+    <!-- Right Column: Settings -->
+    <div class="settings-sections">
+        <div class="settings-panel">
+            <div class="settings-panel-header">
+                <i class="fa-solid fa-gear"></i>
+                <h3>PREFERENCES</h3>
             </div>
-            <div style="padding: 2rem;">
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="margin: 0; font-size: 1rem;">Auto-Save Telemetry</h4>
-                            <p style="margin:  0; font-size: 0.75rem; color: var(--text-muted);">Save sensor data
-                                locally during active missions</p>
-                        </div>
-                        <div
-                            style="width: 40px; height: 20px; background: var(--primary); border-radius: 10px; position: relative;">
-                            <div
-                                style="position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%;">
-                            </div>
-                        </div>
+            <div class="settings-panel-content">
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4 class="settings-item-title">Auto-Save Telemetry</h4>
+                        <p class="settings-item-description">Save sensor data locally during active missions</p>
                     </div>
+                    <div class="toggle-switch-container">
+                        <input type="checkbox" class="toggle-switch" checked>
+                    </div>
+                </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="margin: 0; font-size: 1rem;">High-Quality Video</h4>
-                            <p style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">Enable 4K streaming when
-                                bandwidth allows</p>
-                        </div>
-                        <div
-                            style="width: 40px; height: 20px; background: var(--bg-glass); border: 1px solid var(--border); border-radius: 10px; position: relative;">
-                            <div
-                                style="position: absolute; left: 2px; top: 2px; width: 14px; height: 14px; background: var(--text-muted); border-radius: 50%;">
-                            </div>
-                        </div>
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4 class="settings-item-title">High-Quality Video</h4>
+                        <p class="settings-item-description">Enable 4K streaming when bandwidth allows</p>
+                    </div>
+                    <div class="toggle-switch-container">
+                        <input type="checkbox" class="toggle-switch">
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4 class="settings-item-title">Email Notifications</h4>
+                        <p class="settings-item-description">Receive alerts for mission completion and errors</p>
+                    </div>
+                    <div class="toggle-switch-container">
+                        <input type="checkbox" class="toggle-switch" checked>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="glass-panel"
-            style="padding: 2rem; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <i class="fa-solid fa-circle-exclamation text-danger" style="font-size: 1.25rem;"></i>
-                <div>
-                    <h4 style="margin: 0; font-size: 1rem;">System Reset</h4>
-                    <p style="margin: 0; font-size: 0.75rem; color: var(--text-muted);">Clear local cache and
-                        re-initialize system</p>
+        <div class="settings-panel">
+            <div class="settings-panel-header">
+                <i class="fa-solid fa-lock"></i>
+                <h3>SECURITY</h3>
+            </div>
+            <div class="settings-panel-content">
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4 class="settings-item-title">Two-Factor Authentication</h4>
+                        <p class="settings-item-description">Enhance account security with 2FA</p>
+                    </div>
+                    <div class="toggle-switch-container">
+                        <input type="checkbox" class="toggle-switch">
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-item-info">
+                        <h4 class="settings-item-title">Session Timeout</h4>
+                        <p class="settings-item-description">Auto-logout after 30 minutes of inactivity</p>
+                    </div>
+                    <div class="toggle-switch-container">
+                        <input type="checkbox" class="toggle-switch" checked>
+                    </div>
                 </div>
             </div>
-            <button class="btn-aero btn-outline" style="border-color: var(--danger); color: var(--danger);">Reset
-                Hub</button>
+        </div>
+
+        <div class="danger-section">
+            <div class="danger-icon">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <div class="danger-info">
+                <h3 class="danger-title">System Reset</h3>
+                <p class="danger-description">Clear local cache and re-initialize system. This action cannot be undone.</p>
+            </div>
+            <button class="danger-btn">Reset Hub</button>
         </div>
     </div>
 </div>

@@ -2,49 +2,372 @@
 
 {% block title %}Administrative Override | AeroCore Security{% endblock %}
 
+{% block extra_css %}
+<style>
+    .admin-login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 150px);
+        background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    }
+
+    .admin-login-panel {
+        width: 100%;
+        max-width: 450px;
+        padding: 2.5rem;
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.6) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: var(--radius-lg);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-login-panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .admin-login-panel::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .admin-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-shield-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(124, 58, 255, 0.05) 100%);
+        border: 2px solid rgba(99, 102, 241, 0.4);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        animation: floatIcon 3s ease-in-out infinite;
+    }
+
+    @keyframes floatIcon {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .admin-shield-icon i {
+        font-size: 2rem;
+        background: linear-gradient(135deg, var(--secondary), #A063FF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
+    }
+
+    .admin-login-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        background: linear-gradient(135deg, var(--secondary), #A063FF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-subtitle {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    /* Form Styling */
+    .admin-form {
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-form .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .admin-form .form-label i {
+        margin-right: 0.5rem;
+        color: var(--secondary);
+    }
+
+    .admin-form .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .admin-form .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .admin-form .form-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--secondary);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), inset 0 0 10px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Submit Button */
+    .admin-submit-btn {
+        width: 100%;
+        padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, var(--secondary), #A063FF);
+        border: none;
+        border-radius: var(--radius-md);
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+    }
+
+    .admin-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .admin-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Footer Links */
+    .admin-footer {
+        text-align: center;
+        margin-top: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-footer-text {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .admin-footer-link {
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .admin-footer-link:hover {
+        color: #A063FF;
+        text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .admin-login-panel {
+            max-width: 420px;
+            padding: 2.25rem;
+        }
+
+        .admin-shield-icon {
+            width: 72px;
+            height: 72px;
+        }
+
+        .admin-shield-icon i {
+            font-size: 1.75rem;
+        }
+
+        .admin-login-title {
+            font-size: 1.5rem;
+        }
+
+        .admin-submit-btn {
+            font-size: 0.9rem;
+            padding: 0.85rem 1.25rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-login-container {
+            padding: 1rem;
+        }
+
+        .admin-login-panel {
+            max-width: 100%;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            margin-bottom: 2rem;
+        }
+
+        .admin-shield-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1.25rem;
+        }
+
+        .admin-shield-icon i {
+            font-size: 1.5rem;
+        }
+
+        .admin-login-title {
+            font-size: 1.35rem;
+        }
+
+        .admin-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .admin-submit-btn {
+            font-size: 0.85rem;
+            padding: 0.8rem 1.25rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .admin-login-panel {
+            padding: 1.75rem 1.5rem;
+        }
+
+        .admin-header {
+            margin-bottom: 1.75rem;
+        }
+
+        .admin-shield-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 1rem;
+        }
+
+        .admin-shield-icon i {
+            font-size: 1.35rem;
+        }
+
+        .admin-login-title {
+            font-size: 1.15rem;
+        }
+
+        .admin-subtitle {
+            font-size: 0.775rem;
+        }
+
+        .admin-form .form-label {
+            font-size: 0.8rem;
+        }
+
+        .admin-form .form-input {
+            padding: 0.75rem 0.875rem;
+            font-size: 0.9rem;
+        }
+
+        .admin-submit-btn {
+            font-size: 0.8rem;
+            padding: 0.75rem 1rem;
+            gap: 0.5rem;
+        }
+
+        .admin-submit-btn i {
+            font-size: 0.85rem;
+        }
+
+        .admin-footer-text {
+            font-size: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 150px);">
-    <div class="glass-panel"
-        style="width: 100%; max-width: 450px; padding: 3rem; position: relative; overflow: hidden;">
-        <!-- Top Glow Effect -->
-        <div
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--secondary); box-shadow: 0 0 20px var(--secondary-glow);">
-        </div>
-
-        <div style="text-align: center; margin-bottom: 2.5rem;">
-            <div
-                style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: var(--radius-md); background: rgba(125, 95, 255, 0.1); border: 1px solid var(--secondary-glow); margin-bottom: 1.5rem;">
-                <i class="fa-solid fa-user-shield"
-                    style="font-size: 1.5rem; color: var(--secondary); filter: drop-shadow(0 0 5px var(--secondary-glow));"></i>
+<div class="admin-login-container">
+    <div class="admin-login-panel">
+        <div class="admin-header">
+            <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+                <img src="{{ url_for('static', filename='logoo.png') }}" alt="AeroCore Admin" style="height: 60px; width: auto; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.5));"/>
             </div>
-            <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">ADMIN LOGIN</h2>
-            <p style="color: var(--text-muted); font-size: 0.875rem;">Initialize administrative session
-            </p>
+            <div class="admin-shield-icon">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h2 class="admin-login-title">ADMIN LOGIN</h2>
+            <p class="admin-subtitle">Initialize administrative session</p>
         </div>
 
-        <form method="POST">
+        <form method="POST" class="admin-form">
             <div class="form-group">
-                <label class="form-label" for="email"><i class="fa-solid fa-envelope"></i> Email</label>
-                <input type="email" id="email" name="email" class="form-input" placeholder="admin@aerocore.systems"
+                <label class="form-label" for="email">
+                    <i class="fa-solid fa-envelope"></i> Email
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="admin@aerocore.systems"
                     required>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="password"><i class="fa-solid fa-lock"></i> Password</label>
-                <input type="password" id="password" name="password" class="form-input" placeholder="Enter password"
+                <label class="form-label" for="password">
+                    <i class="fa-solid fa-lock"></i> Password
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Enter password"
                     required>
             </div>
 
-            <button type="submit" class="btn-aero btn-primary"
-                style="width: 100%; justify-content: center; background: var(--secondary); border-color: var(--secondary);">
-                INITIALIZE COMMAND <i class="fa-solid fa-bolt" style="margin-left: 0.5rem;"></i>
+            <button type="submit" class="admin-submit-btn">
+                <span>INITIALIZE COMMAND</span>
+                <i class="fa-solid fa-bolt"></i>
             </button>
         </form>
 
-        <div style="text-align: center; margin-top: 2rem;">
-            <p style="font-size: 0.8125rem; color: var(--text-muted);">
-                Standard personnel? <a href="{{ url_for('login') }}"
-                    style="color: var(--primary); text-decoration: none; font-weight: 600;">Return to Surface</a>
+        <div class="admin-footer">
+            <p class="admin-footer-text">
+                Standard personnel? 
+                <a href="{{ url_for('login') }}" class="admin-footer-link">Return to Surface</a>
             </p>
         </div>
     </div>

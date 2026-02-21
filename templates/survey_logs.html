@@ -1,65 +1,359 @@
 {% extends "base.html" %}
 
-{% block title %}Survey Logs | AeroCore Intelligence{% endblock %}
+{% block title %}Survey Logs | Garuda Aerospace Intelligence{% endblock %}
 
-{% block breadcrumb %}Dashboard / Survey Logs{% endblock %}
+{% block breadcrumb %}Dashboard / <i class="fa-solid fa-timeline"></i> Survey Timeline{% endblock %}
+
+{% block extra_css %}
+<style>
+    .logs-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .logs-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .logs-header p {
+        color: var(--text-tertiary);
+        font-size: 1rem;
+    }
+
+    .logs-panel {
+        background: linear-gradient(135deg, rgba(15, 23, 55, 0.5) 0%, rgba(10, 14, 39, 0.4) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+    }
+
+    .logs-header-bar {
+        padding: 1.75rem 2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(0, 217, 255, 0.05);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .logs-header-bar i {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    .logs-header-bar h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--text-main);
+    }
+
+    .logs-list {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .log-item {
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .log-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.1), transparent);
+        transition: left 0.3s ease;
+    }
+
+    .log-item:hover {
+        border-color: var(--primary);
+        box-shadow: 0 12px 40px rgba(0, 217, 255, 0.2);
+        transform: translateX(4px);
+    }
+
+    .log-item:hover::before {
+        left: 100%;
+    }
+
+    .log-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        font-size: 1.5rem;
+        color: var(--primary);
+        flex-shrink: 0;
+    }
+
+    .log-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .log-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .log-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .log-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .log-status {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-md);
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--success);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 10px var(--success);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .log-action {
+        color: var(--text-muted);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .log-item:hover .log-action {
+        color: var(--primary);
+        transform: translateX(4px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(99, 102, 241, 0.08) 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border);
+        font-size: 2rem;
+        color: var(--text-muted);
+    }
+
+    .empty-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 1024px) {
+        .log-item {
+            flex-wrap: wrap;
+            padding: 1.25rem;
+        }
+
+        .log-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 1.3rem;
+        }
+
+        .logs-header-bar {
+            padding: 1.25rem 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .logs-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .log-item {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .log-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .log-status {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .logs-list {
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .empty-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .logs-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .log-item {
+            padding: 0.75rem;
+        }
+
+        .log-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 1.1rem;
+        }
+
+        .log-title {
+            font-size: 0.95rem;
+        }
+
+        .log-meta {
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 2.5rem;">
-    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">SURVEY LOGS</h1>
-    <p style="color: var(--text-muted);">Historical flight data and processed survey records</p>
+<div class="logs-header">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <img src="{{ url_for('static', filename='logoo.png') }}" alt="AeroCore" style="height: 40px; width: auto; filter: drop-shadow(0 0 10px rgba(0, 217, 255, 0.3));"/>
+        <h1 style="margin: 0;"><i class="fa-solid fa-map-location-dot" style="margin-right: 0.75rem; color: var(--primary);"></i>SURVEY LOGS</h1>
+    </div>
+    <p>Historical flight data and processed survey records</p>
 </div>
 
-<div class="glass-panel" style="padding: 0;">
-    <div class="module-header" style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <i class="fa-solid fa-map-location-dot text-primary"></i>
-            <h3 style="margin: 0;">MISSION TIMELINE</h3>
-        </div>
+<div class="logs-panel">
+    <div class="logs-header-bar">
+        <i class="fa-solid fa-timeline"></i>
+        <h3>MISSION TIMELINE</h3>
+        <span style="margin-left: auto; font-size: 0.8rem; color: var(--text-secondary);">{{ logs|length }} missions</span>
     </div>
 
-    <div style="padding: 1rem;">
+    <div class="logs-list">
         {% if logs %}
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            {% for log in logs %}
-            <a href="{{ url_for('survey_detail', date=log) }}" style="text-decoration: none; color: inherit;">
-                <div class="glass-panel"
-                    style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border: 1px solid var(--border); transition: var(--transition); cursor: pointer;"
-                    onmouseover="this.style.borderColor='var(--primary)'"
-                    onmouseout="this.style.borderColor='var(--border)'">
-                    <div style="display: flex; align-items: center; gap: 1.5rem;">
-                        <div
-                            style="width: 48px; height: 48px; border-radius: var(--radius-sm); background: rgba(0, 242, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-glow);">
-                            <i class="fa-solid fa-calendar-day text-primary"></i>
-                        </div>
-                        <div>
-                            <h4 style="margin: 0; font-size: 1.1rem; color: var(--text-main);">Sector Data: {{ log }}
-                            </h4>
-                            <p style="margin: 0; font-size: 0.8125rem; color: var(--text-muted);">Processed Survey
-                                Record •
-                                Storage: /storage/{{ log }}</p>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span class="status-dot"
-                            style="background: var(--success); box-shadow: 0 0 10px var(--success);"></span>
-                        <span
-                            style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Stored</span>
-                        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.75rem;"></i>
+        {% for log in logs %}
+        <a href="{{ url_for('survey_detail', date=log) }}" style="text-decoration: none; color: inherit;">
+            <div class="log-item">
+                <div class="log-icon">
+                    <i class="fa-solid fa-satellite"></i>
+                </div>
+                <div class="log-info">
+                    <h4 class="log-title">Sector Survey: {{ log }}</h4>
+                    <div class="log-meta">
+                        <span class="log-meta-item">
+                            <i class="fa-solid fa-calendar-day" style="color: var(--primary);"></i>
+                            {{ log }}
+                        </span>
+                        <span class="log-meta-item">
+                            <i class="fa-solid fa-folder-open" style="color: var(--primary);"></i>
+                            /storage/{{ log }}
+                        </span>
+                        <span class="log-meta-item">
+                            <i class="fa-solid fa-database" style="color: var(--primary);"></i>
+                            Complete
+                        </span>
                     </div>
                 </div>
-            </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div style="text-align: center; padding: 4rem 2rem;">
-            <div
-                style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-glass); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; border: 1px solid var(--border);">
-                <i class="fa-solid fa-folder-open text-muted" style="font-size: 1.5rem;"></i>
+                <div class="log-status">
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        Stored
+                    </div>
+                    <i class="fa-solid fa-arrow-right log-action"></i>
+                </div>
             </div>
-            <h3 style="color: var(--text-main);">No Survey Data Found</h3>
-            <p style="color: var(--text-muted); font-size: 0.875rem;">Initialize a mapping mission to generate survey
-                logs.</p>
+        </a>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fa-solid fa-inbox"></i>
+            </div>
+            <h3 class="empty-title">No Survey Data Found</h3>
+            <p class="empty-text">Initialize a mapping mission to generate survey logs</p>
         </div>
         {% endif %}
     </div>

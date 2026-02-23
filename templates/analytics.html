@@ -368,17 +368,22 @@
     </div>
 
     {% if survey_data %}
-    <div class="bar-chart">
-        {% for item in survey_data %}
-        <div class="bar-item">
-            <div class="bar" style="height: {{ (item.size / total_storage * 100) if total_storage > 0 else 5 }}%;" 
-                 title="{{ item.date }}: {{ item.size }} MB">
-            </div>
-            <span class="bar-label">{{ item.date }}</span>
+<div class="bar-chart">
+    {% for item in survey_data %}
+    <div class="bar-item">
+        <div class="bar"
+             style="height: {{ (item.size / total_storage * 100) if total_storage > 0 else 5 }}%;"
+             title="{{ item.date }}: {{ item.size }} MB">
         </div>
-        {% endfor %}
+        <span class="bar-label">{{ item.date }}</span>
     </div>
-    {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+<p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+    No mission data available for visualization.
+</p>
+{% endif %}
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
         <div style="padding: 1rem; background: rgba(0, 217, 255, 0.08); border-radius: var(--radius-md); border-left: 3px solid var(--primary);">
@@ -393,14 +398,6 @@
             <p class="stat-label" style="margin: 0 0 0.5rem 0;">Growth Rate</p>
             <p class="stat-value" style="margin: 0; font-size: 1.3rem; color: var(--accent);">+2.4%/day</p>
         </div>
-    </div>
-</div>
-{% endblock %}
-        </div>
-        {% else %}
-        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No mission data available for
-            visualization.</p>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

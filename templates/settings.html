@@ -491,6 +491,16 @@
             <div class="settings-panel-content">
                 <div class="settings-item">
                     <div class="settings-item-info">
+                        <h4 class="settings-item-title">Change Password</h4>
+                        <p class="settings-item-description">Update your access key regularly for security</p>
+                    </div>
+                    <button class="btn-change-password" onclick="togglePasswordModal()" style="background: rgba(0, 217, 255, 0.15); color: var(--primary); border: 1px solid rgba(0, 217, 255, 0.3); padding: 0.6rem 1.2rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fa-solid fa-key" style="margin-right: 0.5rem;"></i>UPDATE
+                    </button>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-item-info">
                         <h4 class="settings-item-title">Two-Factor Authentication</h4>
                         <p class="settings-item-description">Enhance account security with 2FA</p>
                     </div>
@@ -523,4 +533,69 @@
         </div>
     </div>
 </div>
+
+<!-- Password Change Modal -->
+<div id="passwordModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: linear-gradient(135deg, rgba(15, 23, 55, 0.95) 0%, rgba(10, 14, 39, 0.8) 100%); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; padding: 2.5rem; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h3 style="margin: 0; color: var(--text-main); font-size: 1.3rem; font-weight: 700;"><i class="fa-solid fa-key" style="margin-right: 0.75rem; color: var(--primary);"></i>Change Password</h3>
+            <button onclick="togglePasswordModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.3s;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <form method="POST" action="{{ url_for('change_password') }}" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                    <i class="fa-solid fa-lock-open" style="margin-right: 0.5rem;"></i>Current Password
+                </label>
+                <input type="password" name="current_password" required placeholder="Enter current password" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.03); color: white; font-size: 0.95rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 20px rgba(0, 217, 255, 0.3)';" onblur="this.style.borderColor='rgba(0, 217, 255, 0.2)'; this.style.boxShadow='none';">
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                    <i class="fa-solid fa-lock" style="margin-right: 0.5rem;"></i>New Password
+                </label>
+                <input type="password" name="new_password" required placeholder="Enter new password (min 6 characters)" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.03); color: white; font-size: 0.95rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 20px rgba(0, 217, 255, 0.3)';" onblur="this.style.borderColor='rgba(0, 217, 255, 0.2)'; this.style.boxShadow='none';">
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                    <i class="fa-solid fa-lock" style="margin-right: 0.5rem;"></i>Confirm Password
+                </label>
+                <input type="password" name="confirm_password" required placeholder="Confirm new password" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.03); color: white; font-size: 0.95rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 20px rgba(0, 217, 255, 0.3)';" onblur="this.style.borderColor='rgba(0, 217, 255, 0.2)'; this.style.boxShadow='none';">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" style="flex: 1; padding: 0.9rem; background: linear-gradient(135deg, var(--primary), #00D9FF); border: none; border-radius: 8px; color: #000814; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0, 217, 255, 0.3);">
+                    <i class="fa-solid fa-check" style="margin-right: 0.5rem;"></i>Update Password
+                </button>
+                <button type="button" onclick="togglePasswordModal()" style="flex: 1; padding: 0.9rem; background: transparent; border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s ease;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function togglePasswordModal() {
+    const modal = document.getElementById('passwordModal');
+    if (modal.style.display === 'none') {
+        modal.style.display = 'flex';
+    } else {
+        modal.style.display = 'none';
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('passwordModal');
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock %}

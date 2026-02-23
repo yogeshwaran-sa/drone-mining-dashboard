@@ -45,6 +45,7 @@ video_writer = None   # ✅ ADD THIS LINE
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 last_image_time = 0
+img_counter = 0  # Image capture counter
 # =========================
 # GLOBAL MAPPING STATUS
 # =========================
@@ -136,6 +137,34 @@ def init_db():
 # =========================
 # EMAIL FUNCTION
 # =========================
+def send_email(recipient_email, subject, body):
+    """Generic email sending function"""
+    try:
+        EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+        EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+
+        if not EMAIL_ADDRESS or not EMAIL_PASSWORD:
+            print("❌ Email credentials not found in .env file")
+            return False
+
+        msg = EmailMessage()
+        msg["Subject"] = subject
+        msg["From"] = EMAIL_ADDRESS
+        msg["To"] = recipient_email
+        msg.set_content(body)
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            smtp.send_message(msg)
+
+        print(f"✅ Email Sent To: {recipient_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Email Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
 def send_confirmation_email(message, user_email, pdf_path=None):
     try:
         EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
@@ -303,12 +332,21 @@ def send_whatsapp_message_with_pdf(message, phone_number, pdf_url):
 # =========================
 # EXISTING DRONE LOGIC
 # =========================
-SHOT_URL = "http://10.75.165.104:8080/shot.jpg"
+# Choose camera source: 'phone', 'drone', or 'webcam'
+CAMERA_SOURCE = 'phone'  # Change to 'drone' or 'webcam' as needed
+
+# Phone camera URL (from IP Webcam app)
+PHONE_CAMERA_URL = "http://10.166.28.241:8080/video"  # Your phone camera IP
+
+DRONE_CAMERA_URL = "http://10.75.165.104:8080/shot.jpg"
+SHOT_URL = DRONE_CAMERA_URL
+
 today = datetime.now().strftime("%Y-%m-%d")
 BASE_DIR = os.path.join("storage", today)
 IMG_DIR = os.path.join(BASE_DIR, "images")
 VID_DIR = os.path.join(BASE_DIR, "videos")
 REQ_DIR = os.path.join(BASE_DIR, "requests")
+CAPTURE_INTERVAL = 1  # Capture 1 photo every 1 second
 
 os.makedirs(IMG_DIR, exist_ok=True)
 os.makedirs(VID_DIR, exist_ok=True)
@@ -564,23 +602,72 @@ def generate_pdf_report(volume_value, user_email="Unknown", location="Mining Sit
 def generate_frames():
     global video_writer, last_image_time, img_counter
 
-    while True:
-        try:
-            img_resp = urllib.request.urlopen(SHOT_URL, timeout=5)
-            img_np = np.array(bytearray(img_resp.read()), dtype=np.uint8)
-            frame = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+    cap = None
+    stream = None
 
-            if frame is None:
-                continue
+    # Choose camera source
+    if CAMERA_SOURCE == 'phone':
+        print(f"🎥 Connecting to phone camera: {PHONE_CAMERA_URL}")
+        try:
+            import cv2
+            cap = cv2.VideoCapture(PHONE_CAMERA_URL)
+            if not cap.isOpened():
+                print("❌ Failed to open phone camera!")
+                return
+            print("✅ Phone camera connected!")
+        except Exception as e:
+            print(f"❌ Phone camera error: {e}")
+            return
+
+    elif CAMERA_SOURCE == 'drone':
+        print(f"🎥 Connecting to drone camera: {DRONE_CAMERA_URL}")
+        # Drone camera will be handled via HTTP frames
+
+    else:  # 'webcam'
+        print("🎥 Using local webcam")
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("❌ Failed to open webcam!")
+            return
+        print("✅ Webcam connected!")
+
+    while True:
+        frame = None
+        
+        try:
+            if CAMERA_SOURCE == 'phone' or CAMERA_SOURCE == 'webcam':
+                # Read from camera (phone or local)
+                ret, frame = cap.read()
+                if not ret or frame is None:
+                    print(f"Failed to read frame from {CAMERA_SOURCE}")
+                    time.sleep(1)
+                    continue
+                    
+            elif CAMERA_SOURCE == 'drone':
+                # Fetch from drone camera HTTP endpoint
+                try:
+                    img_resp = urllib.request.urlopen(SHOT_URL, timeout=5)
+                    img_np = np.array(bytearray(img_resp.read()), dtype=np.uint8)
+                    frame = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+                    
+                    if frame is None:
+                        print("Failed to decode drone frame")
+                        time.sleep(1)
+                        continue
+                except Exception as e:
+                    print(f"❌ Drone camera error: {e}")
+                    time.sleep(1)
+                    continue
 
         except Exception as e:
+            print(f"❌ Frame capture error: {e}")
             time.sleep(1)
             continue
 
         current_time = time.time()
 
         # ✅ Start video if not started
-        if video_writer is None:
+        if video_writer is None and frame is not None:
             h, w, _ = frame.shape
 
             video_filename = datetime.now().strftime("%Y%m%d_%H%M%S") + ".avi"
@@ -589,13 +676,14 @@ def generate_frames():
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
             video_writer = cv2.VideoWriter(video_path, fourcc, 20.0, (w, h))
 
-            print("New Video Started:", video_filename)
+            print(f"✅ New Video Started: {video_filename}")
 
         # ✅ Write video frame
-        video_writer.write(frame)
+        if video_writer is not None and frame is not None:
+            video_writer.write(frame)
 
         # ✅ Capture image every interval
-        if current_time - last_image_time >= CAPTURE_INTERVAL:
+        if frame is not None and current_time - last_image_time >= CAPTURE_INTERVAL:
             img_counter += 1
 
             img_name = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -609,13 +697,14 @@ def generate_frames():
             last_image_time = current_time
 
         # ✅ Stream frame for browser
-        ret, buffer = cv2.imencode(".jpg", frame)
-        frame_bytes = buffer.tobytes()
+        if frame is not None:
+            ret, buffer = cv2.imencode(".jpg", frame)
+            frame_bytes = buffer.tobytes()
 
-        yield (b"--frame\r\n"
-               b"Content-Type: image/jpeg\r\n\r\n" +
-               frame_bytes +
-               b"\r\n")
+            yield (b"--frame\r\n"
+                   b"Content-Type: image/jpeg\r\n\r\n" +
+                   frame_bytes +
+                   b"\r\n")
 
 
 def get_mapping_preview(output_path):
@@ -904,6 +993,238 @@ def delete_user(user_id):
     conn.close()
     flash('User Deleted.', 'info')
     return redirect(url_for('admin_dashboard'))
+
+@app.route("/admin/reset-password/<int:user_id>")
+@login_required
+def reset_password_admin(user_id):
+    if current_user.role != 'admin':
+        abort(403)
+    
+    try:
+        import string
+        import random
+        
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        c.execute("SELECT email FROM users WHERE id = ?", (user_id,))
+        user = c.fetchone()
+        
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('admin_dashboard'))
+        
+        # Generate temporary password
+        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        hashed_pw = bcrypt.generate_password_hash(temp_password).decode('utf-8')
+        
+        # Update password in database
+        c.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, user_id))
+        conn.commit()
+        conn.close()
+        
+        # Send reset email
+        user_email = user[0]
+        email_body = f"""
+PASSWORD RESET - AeroCore System
+
+Your password has been reset by an Administrator.
+
+Temporary Password: {temp_password}
+
+Please log in with this temporary password and change it immediately.
+
+DO NOT SHARE THIS PASSWORD WITH ANYONE.
+
+For security: https://aerocore.local/login
+"""
+        
+        send_email(user_email, "Password Reset - AeroCore System", email_body)
+        
+        flash(f'Password reset sent to {user_email}. Temporary password: {temp_password}', 'success')
+    except Exception as e:
+        flash(f'Error resetting password: {str(e)}', 'error')
+    
+    return redirect(url_for('admin_dashboard'))
+
+@app.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Validate
+        if not current_password or not new_password or not confirm_password:
+            flash('All fields are required.', 'error')
+            return redirect(url_for('settings'))
+        
+        if new_password != confirm_password:
+            flash('New passwords do not match.', 'error')
+            return redirect(url_for('settings'))
+        
+        if len(new_password) < 6:
+            flash('Password must be at least 6 characters.', 'error')
+            return redirect(url_for('settings'))
+        
+        try:
+            conn = sqlite3.connect(DB_NAME)
+            c = conn.cursor()
+            c.execute("SELECT password FROM users WHERE id = ?", (current_user.id,))
+            user_data = c.fetchone()
+            
+            if not user_data:
+                flash('User not found.', 'error')
+                conn.close()
+                return redirect(url_for('settings'))
+            
+            # Verify current password
+            if not bcrypt.check_password_hash(user_data[0], current_password):
+                flash('Current password is incorrect.', 'error')
+                conn.close()
+                return redirect(url_for('settings'))
+            
+            # Update password
+            hashed_pw = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            c.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, current_user.id))
+            conn.commit()
+            conn.close()
+            
+            flash('Password changed successfully!', 'success')
+            return redirect(url_for('settings'))
+        except Exception as e:
+            flash(f'Error changing password: {str(e)}', 'error')
+            return redirect(url_for('settings'))
+    
+    return redirect(url_for('settings'))
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get('email')
+        
+        if not email:
+            flash('Please enter your email address.', 'error')
+            return render_template('forgot_password.html')
+        
+        try:
+            conn = sqlite3.connect(DB_NAME)
+            c = conn.cursor()
+            c.execute("SELECT id, email FROM users WHERE email = ?", (email,))
+            user = c.fetchone()
+            conn.close()
+            
+            if user:
+                # Generate reset token
+                import secrets
+                reset_token = secrets.token_urlsafe(32)
+                
+                # Store token in database
+                conn = sqlite3.connect(DB_NAME)
+                c = conn.cursor()
+                c.execute("""
+                    CREATE TABLE IF NOT EXISTS reset_tokens (
+                        id INTEGER PRIMARY KEY,
+                        user_id INTEGER,
+                        token TEXT UNIQUE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                c.execute("DELETE FROM reset_tokens WHERE user_id = ?", (user[0],))
+                c.execute("INSERT INTO reset_tokens (user_id, token) VALUES (?, ?)", (user[0], reset_token))
+                conn.commit()
+                conn.close()
+                
+                # Generate reset link using url_for
+                reset_link = url_for('reset_password_token', token=reset_token, _external=True)
+                email_body = f"""
+PASSWORD RECOVERY - AeroCore System
+
+We received a request to reset your password.
+
+Click the link below to reset your password:
+{reset_link}
+
+This link will expire in 1 hour.
+
+If you didn't request this, please ignore this email.
+
+DO NOT SHARE THIS LINK WITH ANYONE.
+"""
+                send_email(email, "Password Recovery - AeroCore", email_body)
+            
+            # Always show success message (security: don't reveal if email exists)
+            flash('If the email exists in our system, a recovery link has been sent.', 'info')
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash(f'Error processing request: {str(e)}', 'error')
+            return render_template('forgot_password.html')
+    
+    return render_template('forgot_password.html')
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password_token(token):
+    if request.method == "POST":
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not new_password or not confirm_password:
+            flash('All fields are required.', 'error')
+            return render_template('reset_password.html', token=token)
+        
+        if new_password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('reset_password.html', token=token)
+        
+        if len(new_password) < 6:
+            flash('Password must be at least 6 characters.', 'error')
+            return render_template('reset_password.html', token=token)
+        
+        try:
+            conn = sqlite3.connect(DB_NAME)
+            c = conn.cursor()
+            c.execute("SELECT user_id FROM reset_tokens WHERE token = ?", (token,))
+            token_data = c.fetchone()
+            
+            if not token_data:
+                flash('Invalid or expired reset link.', 'error')
+                conn.close()
+                return redirect(url_for('login'))
+            
+            user_id = token_data[0]
+            
+            # Update password
+            hashed_pw = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            c.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, user_id))
+            
+            # Delete used token
+            c.execute("DELETE FROM reset_tokens WHERE token = ?", (token,))
+            
+            conn.commit()
+            conn.close()
+            
+            flash('Password reset successfully! You can now log in with your new password.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash(f'Error resetting password: {str(e)}', 'error')
+            return render_template('reset_password.html', token=token)
+    
+    # GET request - validate token and show form
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        c.execute("SELECT user_id FROM reset_tokens WHERE token = ?", (token,))
+        token_data = c.fetchone()
+        conn.close()
+        
+        if not token_data:
+            flash('Invalid or expired reset link.', 'error')
+            return redirect(url_for('login'))
+        
+        return render_template('reset_password.html', token=token)
+    except Exception as e:
+        flash(f'Error validating reset link: {str(e)}', 'error')
+        return redirect(url_for('login'))
 
 # =========================
 # EXISTING API/VIDEO

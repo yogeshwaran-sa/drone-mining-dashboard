@@ -524,59 +524,87 @@
         </div>
     </div>
 
-    <!-- Personnel Management Table -->
+    <!-- Personnel Management Section -->
     <div class="glass-panel aero-table-container">
         <div class="module-header">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fa-solid fa-users"></i>
-                <h3>USER MANAGEMENT</h3>
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h3 style="display: flex; align-items: center; gap: 0.75rem; margin: 0;">
+                        <i class="fa-solid fa-users" style="color: var(--secondary);"></i>
+                        USER MANAGEMENT PORTAL
+                    </h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 2.5rem;">{{ users_count }} active personnel in system</p>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); text-align: right;">
+                    <div style="padding: 0.5rem 1rem; background: rgba(99, 102, 241, 0.1); border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2);">
+                        Total Users: <strong style="color: var(--secondary);">{{ users_count }}</strong>
+                    </div>
+                </div>
             </div>
         </div>
 
+        {% if users %}
         <div class="table-responsive-wrapper">
             <table class="aero-table">
                 <thead>
                     <tr>
-                        <th>ID_REF</th>
-                        <th>Deployment Entity</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Auth Status</th>
-                        <th>Actions</th>
+                        <th style="width: 12%;">ID</th>
+                        <th style="width: 20%;">Name</th>
+                        <th style="width: 22%;">Email</th>
+                        <th style="width: 12%;">Role</th>
+                        <th style="width: 16%;">Status</th>
+                        <th style="width: 18%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
-                        <td style="font-family: 'Space Grotesk'; font-size: 0.8125rem; color: white; font-weight: 500;">#ID-{{ user[0] }}</td>
                         <td>
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; min-width: 32px;">
-                                    <i class="fa-solid fa-user-tag" style="font-size: 0.75rem; color: var(--text-dim);"></i>
+                            <span style="font-family: 'Space Grotesk'; font-size: 0.8rem; color: var(--secondary); font-weight: 600;">
+                                #{{ user[0] }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; min-width: 36px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(124, 58, 255, 0.2)); border: 1.5px solid rgba(99, 102, 241, 0.4); font-size: 1.1rem;">
+                                    <i class="fa-solid fa-user" style="color: var(--secondary);"></i>
                                 </div>
-                                <span class="fw-normal" style="color: white; font-weight: 500;">{{ user[1] }}</span>
+                                <span style="color: white; font-weight: 600; font-size: 0.95rem;">{{ user[1] }}</span>
                             </div>
                         </td>
                         <td>
-                            <span style="font-size: 0.75rem; color: white; font-weight: 500;">
-                                <i class="fa-solid fa-envelope me-1" style="color: var(--primary);"></i> {{ user[2] }}
+                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 6px; border-left: 3px solid var(--secondary);">
+                                <i class="fa-solid fa-envelope" style="color: var(--secondary); font-size: 0.85rem;"></i>
+                                <span style="color: white; font-size: 0.85rem; font-weight: 500; word-break: break-word;">{{ user[2] }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="display: inline-block; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(124, 58, 255, 0.1)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 6px; color: var(--secondary); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fa-solid fa-shield me-1"></i>{{ user[3] }}
                             </span>
                         </td>
                         <td>
-                            <span style="font-size: 0.75rem; color: white; text-transform: uppercase; font-weight: 600;">
-                                <i class="fa-solid fa-shield-quartered me-1"></i> {{ user[3] }}
+                            {% if user[4] == 'pending' %}
+                            <span class="status-pill status-pending">
+                                <i class="fa-solid fa-spinner" style="animation: spin 1s linear infinite;"></i>
+                                <span>PENDING</span>
                             </span>
+                            {% elif user[4] == 'approved' %}
+                            <span class="status-pill status-approved">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>ACTIVE</span>
+                            </span>
+                            {% else %}
+                            <span class="status-pill status-rejected">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                <span>BLOCKED</span>
+                            </span>
+                            {% endif %}
                         </td>
                         <td>
-                            <span class="status-pill status-{{ user[4] }}">
-                                <i class="fa-solid fa-{% if user[4] == 'approved' %}circle-check{% elif user[4] == 'pending' %}shuttle-space{% else %}circle-xmark{% endif %}"></i>
-                                {{ user[4] }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-group">
+                            <div class="action-group" style="gap: 0.5rem;">
                                 {% if user[4] == 'pending' %}
-                                <a href="{{ url_for('approve_user', user_id=user[0]) }}" class="btn-action-mini" title="Approve Request">
+                                <a href="{{ url_for('approve_user', user_id=user[0]) }}" class="btn-action-mini" title="Approve User" style="background: rgba(0, 255, 157, 0.15); border-color: rgba(0, 255, 157, 0.4); color: #00FF9D;">
                                     <i class="fa-solid fa-check"></i>
                                 </a>
                                 <a href="{{ url_for('reject_user', user_id=user[0]) }}" class="btn-action-mini btn-danger-mini" title="Reject Request">
@@ -588,25 +616,42 @@
                                 </a>
                                 {% endif %}
 
-                                {% if user[3] != 'admin' %}
-                                <a href="{{ url_for('delete_user', user_id=user[0]) }}" class="btn-action-mini btn-danger-mini" onclick="return confirm('CRITICAL: Purge personnel record? This action cannot be undone.')" title="Purge Record">
-                                    <i class="fa-solid fa-trash-can"></i>
+                                {% if user[4] == 'approved' %}
+                                <a href="{{ url_for('reset_password_admin', user_id=user[0]) }}" class="btn-action-mini" title="Reset Password" style="background: rgba(255, 200, 0, 0.15); border-color: rgba(255, 200, 0, 0.4); color: #FFD700;">
+                                    <i class="fa-solid fa-key"></i>
                                 </a>
                                 {% endif %}
+
+                                {% if user[3] != 'admin' %}
+                                <a href="{{ url_for('delete_user', user_id=user[0]) }}" class="btn-action-mini btn-danger-mini" onclick="return confirm('DELETE USER: Are you sure you want to permanently delete {{ user[1] }}?')" title="Delete User">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                                {% else %}
+                                <span class="btn-action-mini" style="background: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.2); color: var(--text-secondary); cursor: not-allowed;" title="Admin protected">
+                                    <i class="fa-solid fa-lock"></i>
+                                </span>
+                                {% endif %}
                             </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center py-5" style="color: var(--text-secondary);">
-                            <i class="fa-solid fa-radar d-block mb-3" style="font-size: 2rem; opacity: 0.3;"></i>
-                            NO PERSONNEL DATA DETECTED IN SECTOR
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem 2rem; background: rgba(99, 102, 241, 0.05); border: 2px dashed var(--border); border-radius: 8px; margin-top: 1.5rem;">
+            <i class="fa-solid fa-users" style="font-size: 3rem; color: var(--text-secondary); opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+            <h4 style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-weight: 600;">NO USERS FOUND</h4>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">No user accounts are currently registered in the system.</p>
+        </div>
+        {% endif %}
     </div>
+
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </div>
 {% endblock %}

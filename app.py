@@ -609,15 +609,25 @@ def generate_frames():
     if CAMERA_SOURCE == 'phone':
         print(f"🎥 Connecting to phone camera: {PHONE_CAMERA_URL}")
         try:
-            import cv2
             cap = cv2.VideoCapture(PHONE_CAMERA_URL)
             if not cap.isOpened():
                 print("❌ Failed to open phone camera!")
-                return
-            print("✅ Phone camera connected!")
+                print("⚠️ Falling back to local webcam...")
+                cap = cv2.VideoCapture(0)
+                if not cap.isOpened():
+                    print("❌ Webcam also not available!")
+                    return
+                print("✅ Webcam connected as fallback!")
+            else:
+                print("✅ Phone camera connected!")
         except Exception as e:
             print(f"❌ Phone camera error: {e}")
-            return
+            print("⚠️ Falling back to local webcam...")
+            cap = cv2.VideoCapture(0)
+            if not cap.isOpened():
+                print("❌ Webcam also not available!")
+                return
+            print("✅ Webcam connected as fallback!")
 
     elif CAMERA_SOURCE == 'drone':
         print(f"🎥 Connecting to drone camera: {DRONE_CAMERA_URL}")
@@ -1538,25 +1548,52 @@ def ai_request():
         whatsapp_success = False
         if phone:
             try:
-                # Get public URL for PDF - use relative path that will be served
-                pdf_filename = os.path.basename(pdf_path)
-                request_date = datetime.now().strftime('%Y-%m-%d')
-                # Using localhost for development - change to actual domain in production
-                pdf_url = f"http://localhost:5000/download_survey_pdf/{request_date}/{pdf_filename}"
-                
                 whatsapp_message = f"Your Drone Survey Request has been received!\n\n📋 Request ID: {timestamp}\n\nObjectives:\n{message}"
                 if volume:
                     whatsapp_message += f"\n\n📊 Volume: {volume} m³"
                 
+                whatsapp_message += f"\n\n📄 PDF Report:\nYou'll receive the detailed PDF report via email Already.\n\nThank you,\nGaruda Aerospace Team"
+                
                 print(f"\n📱 Sending WhatsApp...")
-                whatsapp_success = send_whatsapp_message_with_pdf(
-                    message=whatsapp_message,
-                    phone_number=phone,
-                    pdf_url=pdf_url
-                )
-                print(f"✅ WhatsApp sent successfully to {phone}")
+                
+                # Try simple text message first (without PDF URL issue)
+                try:
+                    TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+                    TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+                    TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_NUMBER")
+                    
+                    if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_WHATSAPP_FROM:
+                        twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+                        
+                        # Normalize phone number
+                        normalized_phone = phone.replace(" ", "").replace("-", "")
+                        if normalized_phone.startswith("91") and not normalized_phone.startswith("+"):
+                            normalized_phone = "+" + normalized_phone
+                        elif len(normalized_phone) == 10:
+                            normalized_phone = "+91" + normalized_phone
+                        
+                        to_number = "whatsapp:" + normalized_phone
+                        
+                        msg = twilio_client.messages.create(
+                            from_=TWILIO_WHATSAPP_FROM,
+                            to=to_number,
+                            body=whatsapp_message
+                        )
+                        
+                        print(f"✅ WhatsApp Text Sent Successfully: {msg.sid}")
+                        whatsapp_success = True
+                    else:
+                        print("⚠️ Twilio credentials incomplete")
+                        whatsapp_success = False
+                        
+                except Exception as whatsapp_error:
+                    print(f"⚠️ WhatsApp send error (non-critical): {whatsapp_error}")
+                    import traceback
+                    traceback.print_exc()
+                    whatsapp_success = False
+                    
             except Exception as e:
-                print(f"⚠️ WhatsApp send error (non-critical): {e}")
+                print(f"⚠️ WhatsApp processing error: {e}")
                 import traceback
                 traceback.print_exc()
                 whatsapp_success = False
